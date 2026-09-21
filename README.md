@@ -1,59 +1,316 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistem Informasi Operasional Kopi Keliling Kopikeun
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Sistem informasi berbasis web untuk mendukung pengelolaan operasional
+**Kopi Keliling Kopikeun**. Aplikasi dirancang dengan pendekatan
+**mobile-first** agar nyaman digunakan melalui perangkat mobile maupun
+desktop.
 
-## About Laravel
+## Fitur Utama
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+-   Authentication dan hak akses berbasis role
+-   Dashboard
+-   Pengelolaan produk
+-   Pencatatan stok bahan baku
+-   Pencatatan barang masuk
+-   Pencatatan pengeluaran operasional
+-   Transaksi penjualan
+-   Distribusi produk jadi kepada karyawan
+-   Pencatatan sisa produk
+-   Pengelolaan karyawan
+-   Laporan keuangan
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Role Pengguna
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Owner
 
-## Learning Laravel
+-   Melihat dashboard
+-   Mengelola produk
+-   Melakukan transaksi penjualan
+-   Mengelola karyawan
+-   Melihat laporan keuangan
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Admin
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+-   Melihat dashboard
+-   Mengelola produk
+-   Mencatat stok bahan baku
+-   Mencatat barang masuk
+-   Mencatat pengeluaran operasional
+-   Melakukan transaksi penjualan
+-   Mencatat distribusi produk
+-   Mencatat sisa produk
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+### Karyawan
 
-## Agentic Development
+-   Login
+-   Melihat dashboard
+-   Melakukan transaksi penjualan
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Modul
 
-```bash
-composer require laravel/boost --dev
+### Produk
 
-php artisan boost:install
+CRUD data produk.
+
+### Stok Bahan Baku
+
+Mencatat kondisi stok berdasarkan hasil pengecekan stok.
+
+### Barang Masuk
+
+Mencatat bahan baku yang diterima atau dibeli.
+
+-   Jika bahan sudah ada, jumlah masuk ditambahkan ke stok.
+-   Jika bahan belum ada, sistem membuat data bahan baru dengan stok
+    awal sebesar jumlah masuk.
+-   Setiap barang masuk tetap disimpan sebagai riwayat.
+-   Harga pembelian dicatat untuk kebutuhan laporan keuangan.
+
+### Pengeluaran Operasional
+
+Mencatat pengeluaran seperti bensin, gas, kemasan, dan biaya operasional
+lainnya.
+
+Data minimal: - Jenis pengeluaran - Jumlah - Tanggal - Keterangan
+
+### Transaksi Penjualan
+
+Alur utama: 1. Memilih produk 2. Memasukkan jumlah 3. Sistem menghitung
+subtotal dan total 4. Memilih metode pembayaran 5. Menyimpan transaksi
+
+Metode pembayaran: - Cash - QRIS
+
+### Distribusi Produk
+
+Admin mencatat produk jadi yang diberikan kepada karyawan untuk dibawa
+ke gerobak.
+
+### Sisa Produk
+
+Admin mencatat produk yang masih tersisa ketika karyawan kembali. Data
+distribusi tidak diubah; sisa dicatat sebagai data tersendiri.
+
+### Pengelolaan Karyawan
+
+Owner mengelola data karyawan.
+
+### Laporan Keuangan
+
+Owner melihat laporan berdasarkan periode tertentu.
+
+Sumber data: - Pemasukan dari transaksi penjualan - Pengeluaran
+pembelian bahan baku dari barang masuk - Pengeluaran operasional
+
+Rumus:
+
+``` text
+Total Pengeluaran =
+Total Pembelian Bahan Baku + Total Pengeluaran Operasional
+
+Keuntungan =
+Total Pemasukan - Total Pengeluaran
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Teknologi
 
-## Contributing
+-   PHP 8.3
+-   Laravel
+-   Laravel Breeze
+-   Tailwind CSS
+-   Vite
+-   MySQL
+-   Git & GitHub
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+> Versi Laravel dan dependency mengikuti versi yang terpasang pada
+> project.
 
-## Code of Conduct
+## UI/UX
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Aplikasi menggunakan pendekatan **mobile-first**.
 
-## Security Vulnerabilities
+Prinsip: - Desain dimulai dari layar mobile. - Layout responsif untuk
+tablet dan desktop. - Navigasi sederhana. - Form nyaman digunakan pada
+layar sentuh. - Informasi penting mudah dipindai. - Komponen UI
+konsisten.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Arsitektur
 
-## License
+``` text
+User
+  ↓
+View
+  ↓
+Controller
+  ↓
+Model
+  ↓
+Database
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-"# KopiKeun" 
+## Alur Pengembangan
+
+``` text
+Requirement
+    ↓
+Use Case
+    ↓
+Activity Diagram
+    ↓
+Sequence Diagram
+    ↓
+Implementasi
+    ↓
+Database
+    ↓
+Testing
+    ↓
+Finalisasi ERD & Class Diagram
+```
+
+## Instalasi
+
+### 1. Clone repository
+
+``` bash
+git clone <repository-url>
+cd <nama-project>
+```
+
+### 2. Install dependency
+
+``` bash
+composer install
+npm install
+```
+
+### 3. Buat environment
+
+``` bash
+cp .env.example .env
+```
+
+Windows PowerShell:
+
+``` powershell
+Copy-Item .env.example .env
+```
+
+### 4. Generate key
+
+``` bash
+php artisan key:generate
+```
+
+### 5. Konfigurasi database
+
+Edit `.env`:
+
+``` env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=kopikeun
+DB_USERNAME=root
+DB_PASSWORD=
+```
+
+### 6. Migration
+
+``` bash
+php artisan migrate
+```
+
+Jika tersedia seeder:
+
+``` bash
+php artisan db:seed
+```
+
+### 7. Jalankan aplikasi
+
+Terminal 1:
+
+``` bash
+php artisan serve
+```
+
+Terminal 2:
+
+``` bash
+npm run dev
+```
+
+Buka:
+
+``` text
+http://127.0.0.1:8000
+```
+
+## Git Workflow
+
+Jangan push langsung ke branch utama.
+
+``` text
+Pull
+ ↓
+Buat branch fitur
+ ↓
+Coding
+ ↓
+Testing
+ ↓
+Commit
+ ↓
+Push
+ ↓
+Pull Request
+ ↓
+Merge
+```
+
+Contoh:
+
+``` bash
+git pull origin main
+git checkout -b feature/nama-fitur
+```
+
+Penamaan branch:
+
+``` text
+feature/nama-fitur
+fix/nama-masalah
+refactor/nama-perubahan
+```
+
+## Status Pengembangan
+
+-   [x] Analisis kebutuhan
+-   [x] Use Case
+-   [x] Activity Diagram
+-   [x] Sequence Diagram
+-   [ ] Setup project final
+-   [ ] Authentication & role
+-   [ ] Database implementation
+-   [ ] Produk
+-   [ ] Bahan baku
+-   [ ] Barang masuk
+-   [ ] Pengeluaran operasional
+-   [ ] Transaksi penjualan
+-   [ ] Distribusi produk
+-   [ ] Sisa produk
+-   [ ] Pengelolaan karyawan
+-   [ ] Laporan keuangan
+-   [ ] Dashboard
+-   [ ] Testing
+-   [ ] ERD final
+-   [ ] Class Diagram final
+-   [ ] Deployment
+
+## Catatan
+
+Project ini dikembangkan sebagai bagian dari **Kerja Praktik (KP)**
+dengan studi kasus **Kopi Keliling Kopikeun**.
+
+Dokumentasi teknis akan diperbarui mengikuti perkembangan implementasi
+aplikasi.
