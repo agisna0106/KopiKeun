@@ -65,6 +65,7 @@
             <div class="grid grid-cols-2 gap-3">
 
                 <x-app-card class="text-center">
+                    
                     <div class="text-2xl">🛒</div>
 
                     <div class="mt-2 text-sm font-semibold text-stone-800">
@@ -76,17 +77,19 @@
                     </div>
                 </x-app-card>
 
-                <x-app-card class="text-center">
-                    <div class="text-2xl">📦</div>
+                <a href="{{ route('products.index') }}">
+                    <x-app-card class="text-center">
+                        <div class="text-2xl">📦</div>
 
-                    <div class="mt-2 text-sm font-semibold text-stone-800">
-                        Produk
-                    </div>
+                        <div class="mt-2 text-sm font-semibold text-stone-800">
+                            Produk
+                        </div>
 
-                    <div class="mt-1 text-xs text-stone-500">
-                        Kelola produk
-                    </div>
-                </x-app-card>
+                        <div class="mt-1 text-xs text-stone-500">
+                            Kelola produk
+                        </div>
+                    </x-app-card>
+                </a>
 
             </div>
 

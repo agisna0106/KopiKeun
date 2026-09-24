@@ -29,9 +29,9 @@
                     Dashboard
                 </a>
 
-                @if(auth()->user()->role?->nama_role === 'Owner' || auth()->user()->role?->nama_role === 'Admin')
+               @if(in_array(auth()->user()->role?->nama_role, ['Owner', 'Admin']))
                     <a
-                        href="#"
+                        href="{{ route('products.index') }}"
                         class="rounded-lg px-3 py-2 text-sm font-medium text-stone-600 transition hover:bg-stone-100 hover:text-stone-900"
                     >
                         Produk
