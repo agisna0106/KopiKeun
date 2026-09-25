@@ -22,7 +22,7 @@ class EmployeeController extends Controller
     public function create(): View
     {
         $users = User::whereHas('role', function ($query) {
-            $query->where('nama_role', ['Admin', 'Karyawan']);
+            $query->whereIn('nama_role', ['Admin', 'Karyawan']);
         })
         ->whereDoesntHave('employee')
         ->orderBy('name')
