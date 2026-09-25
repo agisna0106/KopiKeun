@@ -9,6 +9,7 @@ use App\Http\Controllers\RawMaterialStockRecordController;
 use App\Http\Controllers\IncomingGoodController;
 use App\Http\Controllers\OperationalExpenseController;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\DistributionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -64,6 +65,8 @@ Route::middleware(['auth', 'role:Owner,Admin'])
         )->except(['show']);
 
         Route::resource('sales', SaleController::class);
+
+        Route::resource('distributions', DistributionController::class);
 
     });
 

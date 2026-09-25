@@ -28,4 +28,12 @@ class BaseDrink extends Model
             'base_drink_id'
         );
     }
+
+    public function distributionDetails(): HasMany
+    {
+        return $this->hasMany(
+            DistributionDetail::class,
+            'base_drink_id'
+        );
+    }
 }
