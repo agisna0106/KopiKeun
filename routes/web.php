@@ -7,6 +7,7 @@ use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\RawMaterialController;
 use App\Http\Controllers\RawMaterialStockRecordController;
 use App\Http\Controllers\IncomingGoodController;
+use App\Http\Controllers\OperationalExpenseController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -39,12 +40,19 @@ Route::middleware(['auth', 'role:Owner,Admin'])
     ->group(function () {
         Route::resource('products', ProductController::class)
             ->except(['show']);
+
         Route::resource('raw-materials', RawMaterialController::class)
             ->except(['show']);
-        Route::resource(
-            'incoming-goods',
-            IncomingGoodController::class
+
+        Route::resource('incoming-goods',IncomingGoodController::class
         )->except(['show']);
+
+        Route::resource('raw-material-stock-records',RawMaterialStockRecordController::class
+        )->except(['show']);
+
+        Route::resource('operational-expenses',OperationalExpenseController::class
+        )->except(['show']);
+
     });
 
 Route::middleware(['auth', 'role:Owner'])
@@ -53,13 +61,6 @@ Route::middleware(['auth', 'role:Owner'])
             ->except(['show']);
     });
 
-Route::middleware(['auth', 'role:Owner,Admin'])
-    ->group(function () {
-        Route::resource(
-            'raw-material-stock-records',
-            RawMaterialStockRecordController::class
-        )->except(['show']);
-    });
 
 Route::get('/owner-test', function () {
     return 'Halaman khusus Owner';
