@@ -29,4 +29,12 @@ class RawMaterial extends Model
             'raw_material_id'
         );
     }
+
+        public function incomingGoods(): HasMany
+    {
+        return $this->hasMany(
+            IncomingGood::class,
+            'raw_material_id'
+        );
+    }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\RawMaterialController;
 use App\Http\Controllers\RawMaterialStockRecordController;
+use App\Http\Controllers\IncomingGoodController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -40,6 +41,10 @@ Route::middleware(['auth', 'role:Owner,Admin'])
             ->except(['show']);
         Route::resource('raw-materials', RawMaterialController::class)
             ->except(['show']);
+        Route::resource(
+            'incoming-goods',
+            IncomingGoodController::class
+        )->except(['show']);
     });
 
 Route::middleware(['auth', 'role:Owner'])
