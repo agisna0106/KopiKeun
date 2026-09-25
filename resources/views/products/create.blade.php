@@ -23,132 +23,154 @@
 
         <x-app-card>
 
-            <form
-                action="{{ route('products.store') }}"
-                method="POST"
-                class="space-y-5"
-            >
-
+            <form method="POST" action="{{ route('products.store') }}" class="space-y-5">
                 @csrf
 
                 {{-- Nama Produk --}}
                 <div>
-
                     <label
-                        for="nama_produk"
-                        class="mb-2 block text-sm font-semibold text-stone-700"
+                        for="name"
+                        class="block text-sm font-medium text-stone-700"
                     >
                         Nama Produk
                     </label>
 
                     <input
                         type="text"
-                        id="nama_produk"
-                        name="nama_produk"
-                        value="{{ old('nama_produk') }}"
-                        placeholder="Contoh: Kopi Susu"
+                        name="name"
+                        id="name"
+                        value="{{ old('name') }}"
                         required
-                        class="w-full rounded-xl border-stone-300 px-4 py-3 text-sm focus:border-amber-900 focus:ring-amber-900"
+                        class="mt-1 block w-full rounded-lg border-stone-300 shadow-sm
+                            focus:border-amber-600 focus:ring-amber-600"
                     >
 
-                    @error('nama_produk')
-                        <p class="mt-1 text-xs text-red-600">
+                    @error('name')
+                        <p class="mt-1 text-sm text-red-600">
                             {{ $message }}
                         </p>
                     @enderror
+                </div>
 
+                {{-- Minuman Dasar --}}
+                <div>
+                    <label
+                        for="base_drink_id"
+                        class="block text-sm font-medium text-stone-700"
+                    >
+                        Minuman Dasar
+                    </label>
+
+                    <select
+                        name="base_drink_id"
+                        id="base_drink_id"
+                        required
+                        class="mt-1 block w-full rounded-lg border-stone-300 shadow-sm
+                            focus:border-amber-600 focus:ring-amber-600"
+                    >
+                        <option value="">Pilih Minuman Dasar</option>
+
+                        @foreach ($baseDrinks as $baseDrink)
+                            <option
+                                value="{{ $baseDrink->id }}"
+                                {{ old('base_drink_id') == $baseDrink->id ? 'selected' : '' }}
+                            >
+                                {{ $baseDrink->name }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    @error('base_drink_id')
+                        <p class="mt-1 text-sm text-red-600">
+                            {{ $message }}
+                        </p>
+                    @enderror
                 </div>
 
                 {{-- Harga --}}
                 <div>
-
                     <label
-                        for="harga"
-                        class="mb-2 block text-sm font-semibold text-stone-700"
+                        for="price"
+                        class="block text-sm font-medium text-stone-700"
                     >
-                        Harga Jual
+                        Harga
                     </label>
 
-                    <div class="relative">
+                    <input
+                        type="number"
+                        name="price"
+                        id="price"
+                        value="{{ old('price') }}"
+                        min="0"
+                        step="0.01"
+                        required
+                        class="mt-1 block w-full rounded-lg border-stone-300 shadow-sm
+                            focus:border-amber-600 focus:ring-amber-600"
+                    >
 
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-stone-500">
-                            Rp
-                        </span>
-
-                        <input
-                            type="number"
-                            id="harga"
-                            name="harga"
-                            value="{{ old('harga') }}"
-                            min="0"
-                            step="100"
-                            placeholder="10000"
-                            required
-                            class="w-full rounded-xl border-stone-300 py-3 pl-11 pr-4 text-sm focus:border-amber-900 focus:ring-amber-900"
-                        >
-
-                    </div>
-
-                    @error('harga')
-                        <p class="mt-1 text-xs text-red-600">
+                    @error('price')
+                        <p class="mt-1 text-sm text-red-600">
                             {{ $message }}
                         </p>
                     @enderror
-
                 </div>
 
                 {{-- Status --}}
                 <div>
-
                     <label
                         for="status"
-                        class="mb-2 block text-sm font-semibold text-stone-700"
+                        class="block text-sm font-medium text-stone-700"
                     >
                         Status
                     </label>
 
                     <select
-                        id="status"
                         name="status"
+                        id="status"
                         required
-                        class="w-full rounded-xl border-stone-300 px-4 py-3 text-sm focus:border-amber-900 focus:ring-amber-900"
                     >
-                        <option value="Aktif" @selected(old('status', 'Aktif') === 'Aktif')>
-                            Aktif
+                        <option
+                            value="Active"
+                            {{ old('status', 'Active') === 'Active' ? 'selected' : '' }}
+                        >
+                            Active
                         </option>
 
-                        <option value="Tidak Aktif" @selected(old('status') === 'Tidak Aktif')>
-                            Tidak Aktif
+                        <option
+                            value="Inactive"
+                            {{ old('status') === 'Inactive' ? 'selected' : '' }}
+                        >
+                            Inactive
                         </option>
                     </select>
 
                     @error('status')
-                        <p class="mt-1 text-xs text-red-600">
+                        <p class="mt-1 text-sm text-red-600">
                             {{ $message }}
                         </p>
                     @enderror
-
                 </div>
 
-                {{-- Button --}}
-                <div class="flex gap-3 pt-2">
-
-                    <a
-                        href="{{ route('products.index') }}"
-                        class="flex-1 rounded-xl border border-stone-300 px-4 py-3 text-center text-sm font-semibold text-stone-700"
-                    >
-                        Batal
-                    </a>
-
+                {{-- Tombol --}}
+                <div class="flex flex-col gap-2 sm:flex-row">
                     <button
                         type="submit"
-                        class="flex-1 rounded-xl bg-amber-900 px-4 py-3 text-sm font-semibold text-white hover:bg-amber-950"
+                        class="inline-flex justify-center rounded-lg bg-amber-700
+                            px-4 py-2 text-sm font-semibold text-white
+                            hover:bg-amber-800"
                     >
                         Simpan Produk
                     </button>
 
+                    <a
+                        href="{{ route('products.index') }}"
+                        class="inline-flex justify-center rounded-lg bg-stone-200
+                            px-4 py-2 text-sm font-semibold text-stone-700
+                            hover:bg-stone-300"
+                    >
+                        Batal
+                    </a>
                 </div>
-
             </form>
 
         </x-app-card>

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Models\Role;
 
 #[Fillable(['name', 'email', 'password'])]
@@ -35,5 +36,10 @@ class User extends Authenticatable
     public function role(): BelongsTo
     {
          return $this->belongsTo(Role::class, 'role_id', 'id_role');
+    }
+
+    public function employee(): HasOne
+    {
+        return $this->hasOne(Employee::class);
     }
 }

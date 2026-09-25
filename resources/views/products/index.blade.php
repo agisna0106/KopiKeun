@@ -89,16 +89,20 @@
                             <div class="min-w-0">
 
                                 <h2 class="truncate text-base font-bold text-stone-900">
-                                    {{ $product->nama_produk }}
+                                    {{ $product->name }}
                                 </h2>
 
+                                <p class="mt-1 text-sm text-stone-500">
+                                    Dasar: {{ $product->baseDrink?->name ?? 'No Base Drink' }}
+                                </p>
+
                                 <p class="mt-1 text-lg font-bold text-amber-900">
-                                    Rp {{ number_format($product->harga, 0, ',', '.') }}
+                                    Rp {{ number_format($product->price, 0, ',', '.') }}
                                 </p>
 
                                 <span
                                     class="mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold
-                                    {{ $product->status === 'Aktif'
+                                    {{ $product->status === 'Active'
                                         ? 'bg-green-100 text-green-700'
                                         : 'bg-stone-100 text-stone-600'
                                     }}"

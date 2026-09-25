@@ -23,137 +23,157 @@
 
         <x-app-card>
 
-            <form
-                action="{{ route('products.update', $product) }}"
-                method="POST"
-                class="space-y-5"
-            >
-
+            <form method="POST" action="{{ route('products.update', $product) }}" class="space-y-5">
                 @csrf
                 @method('PUT')
 
-                {{-- Nama Produk --}}
+                {{-- Product Name --}}
                 <div>
-
                     <label
-                        for="nama_produk"
-                        class="mb-2 block text-sm font-semibold text-stone-700"
+                        for="name"
+                        class="block text-sm font-medium text-stone-700"
                     >
-                        Nama Produk
+                        Product Name
                     </label>
 
                     <input
                         type="text"
-                        id="nama_produk"
-                        name="nama_produk"
-                        value="{{ old('nama_produk', $product->nama_produk) }}"
+                        name="name"
+                        id="name"
+                        value="{{ old('name', $product->name) }}"
                         required
-                        class="w-full rounded-xl border-stone-300 px-4 py-3 text-sm focus:border-amber-900 focus:ring-amber-900"
+                        class="mt-1 block w-full rounded-lg border-stone-300 shadow-sm
+                            focus:border-amber-600 focus:ring-amber-600"
                     >
 
-                    @error('nama_produk')
-                        <p class="mt-1 text-xs text-red-600">
+                    @error('name')
+                        <p class="mt-1 text-sm text-red-600">
                             {{ $message }}
                         </p>
                     @enderror
-
                 </div>
 
-                {{-- Harga --}}
+                {{-- Base Drink --}}
                 <div>
-
                     <label
-                        for="harga"
-                        class="mb-2 block text-sm font-semibold text-stone-700"
+                        for="base_drink_id"
+                        class="block text-sm font-medium text-stone-700"
                     >
-                        Harga Jual
+                        Base Drink
                     </label>
 
-                    <div class="relative">
+                    <select
+                        name="base_drink_id"
+                        id="base_drink_id"
+                        required
+                        class="mt-1 block w-full rounded-lg border-stone-300 shadow-sm
+                            focus:border-amber-600 focus:ring-amber-600"
+                    >
+                        <option value="">Select Base Drink</option>
 
-                        <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm text-stone-500">
-                            Rp
-                        </span>
+                        @foreach ($baseDrinks as $baseDrink)
+                            <option
+                                value="{{ $baseDrink->id }}"
+                                {{ old('base_drink_id', $product->base_drink_id) == $baseDrink->id ? 'selected' : '' }}
+                            >
+                                {{ $baseDrink->name }}
+                            </option>
+                        @endforeach
+                    </select>
 
-                        <input
-                            type="number"
-                            id="harga"
-                            name="harga"
-                            value="{{ old('harga', $product->harga) }}"
-                            min="0"
-                            step="100"
-                            required
-                            class="w-full rounded-xl border-stone-300 py-3 pl-11 pr-4 text-sm focus:border-amber-900 focus:ring-amber-900"
-                        >
-
-                    </div>
-
-                    @error('harga')
-                        <p class="mt-1 text-xs text-red-600">
+                    @error('base_drink_id')
+                        <p class="mt-1 text-sm text-red-600">
                             {{ $message }}
                         </p>
                     @enderror
+                </div>
 
+                {{-- Price --}}
+                <div>
+                    <label
+                        for="price"
+                        class="block text-sm font-medium text-stone-700"
+                    >
+                        Price
+                    </label>
+
+                    <input
+                        type="number"
+                        name="price"
+                        id="price"
+                        value="{{ old('price', $product->price) }}"
+                        min="0"
+                        step="0.01"
+                        required
+                        class="mt-1 block w-full rounded-lg border-stone-300 shadow-sm
+                            focus:border-amber-600 focus:ring-amber-600"
+                    >
+
+                    @error('price')
+                        <p class="mt-1 text-sm text-red-600">
+                            {{ $message }}
+                        </p>
+                    @enderror
                 </div>
 
                 {{-- Status --}}
                 <div>
-
                     <label
                         for="status"
-                        class="mb-2 block text-sm font-semibold text-stone-700"
+                        class="block text-sm font-medium text-stone-700"
                     >
                         Status
                     </label>
 
                     <select
-                        id="status"
                         name="status"
+                        id="status"
                         required
-                        class="w-full rounded-xl border-stone-300 px-4 py-3 text-sm focus:border-amber-900 focus:ring-amber-900"
+                        class="mt-1 block w-full rounded-lg border-stone-300 shadow-sm
+                            focus:border-amber-600 focus:ring-amber-600"
                     >
                         <option
-                            value="Aktif"
-                            @selected(old('status', $product->status) === 'Aktif')
+                            value="Active"
+                            {{ old('status', $product->status) === 'Active' ? 'selected' : '' }}
                         >
-                            Aktif
+                            Active
                         </option>
 
                         <option
-                            value="Tidak Aktif"
-                            @selected(old('status', $product->status) === 'Tidak Aktif')
+                            value="Inactive"
+                            {{ old('status', $product->status) === 'Inactive' ? 'selected' : '' }}
                         >
-                            Tidak Aktif
+                            Inactive
                         </option>
                     </select>
 
                     @error('status')
-                        <p class="mt-1 text-xs text-red-600">
+                        <p class="mt-1 text-sm text-red-600">
                             {{ $message }}
                         </p>
                     @enderror
-
                 </div>
 
-                {{-- Button --}}
-                <div class="flex gap-3 pt-2">
+                {{-- Buttons --}}
+                <div class="flex flex-col gap-2 sm:flex-row">
+                    <button
+                        type="submit"
+                        class="inline-flex justify-center rounded-lg bg-amber-700
+                            px-4 py-2 text-sm font-semibold text-white
+                            hover:bg-amber-800"
+                    >
+                        Update Product
+                    </button>
 
                     <a
                         href="{{ route('products.index') }}"
-                        class="flex-1 rounded-xl border border-stone-300 px-4 py-3 text-center text-sm font-semibold text-stone-700"
+                        class="inline-flex justify-center rounded-lg bg-stone-200
+                            px-4 py-2 text-sm font-semibold text-stone-700
+                            hover:bg-stone-300"
                     >
-                        Batal
+                        Cancel
                     </a>
-
-                    <button
-                        type="submit"
-                        class="flex-1 rounded-xl bg-amber-900 px-4 py-3 text-sm font-semibold text-white hover:bg-amber-950"
-                    >
-                        Simpan Perubahan
-                    </button>
-
                 </div>
-
             </form>
 
         </x-app-card>

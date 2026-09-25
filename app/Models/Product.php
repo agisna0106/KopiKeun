@@ -3,20 +3,28 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Product extends Model
 {
     protected $table = 'products';
 
-    protected $primaryKey = 'id_produk';
-
     protected $fillable = [
-        'nama_produk',
-        'harga',
+        'name',
+        'base_drink_id',
+        'price',
         'status',
     ];
 
     protected $casts = [
-        'harga' => 'decimal:2',
+        'price' => 'decimal:2',
     ];
+
+    public function baseDrink(): BelongsTo
+    {
+        return $this->belongsTo(
+            BaseDrink::class,
+            'base_drink_id'
+        );
+    }
 }
