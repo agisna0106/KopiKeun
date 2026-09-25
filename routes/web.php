@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\RawMaterialController;
+use App\Http\Controllers\RawMaterialStockRecordController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -36,12 +38,22 @@ Route::middleware(['auth', 'role:Owner,Admin'])
     ->group(function () {
         Route::resource('products', ProductController::class)
             ->except(['show']);
+        Route::resource('raw-materials', RawMaterialController::class)
+            ->except(['show']);
     });
 
 Route::middleware(['auth', 'role:Owner'])
     ->group(function () {
         Route::resource('employees', EmployeeController::class)
             ->except(['show']);
+    });
+
+Route::middleware(['auth', 'role:Owner,Admin'])
+    ->group(function () {
+        Route::resource(
+            'raw-material-stock-records',
+            RawMaterialStockRecordController::class
+        )->except(['show']);
     });
 
 Route::get('/owner-test', function () {
