@@ -10,27 +10,18 @@ use App\Http\Controllers\IncomingGoodController;
 use App\Http\Controllers\OperationalExpenseController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\DistributionController;
+use App\Http\Controllers\RemainingProductController;
+use App\Http\Controllers\FinancialReportController;
+use App\Http\Controllers\DashboardController;
 
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
-    $user = auth()->user();
-
-    if (!$user) {
-        return redirect()->route('login');
-    }
-
-    $role = $user->role->nama_role;
-
-    return match ($role) {
-        'Owner' => view('dashboard.owner'),
-        'Admin' => view('dashboard.admin'),
-        'Karyawan' => view('dashboard.karyawan'),
-        default => abort(403, 'Role pengguna tidak dikenali.'),
-    };
-})->middleware(['auth'])->name('dashboard');
+Route::get(
+    '/dashboard',
+    [DashboardController::class, 'index']
+)->middleware(['auth'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -68,12 +59,20 @@ Route::middleware(['auth', 'role:Owner,Admin'])
 
         Route::resource('distributions', DistributionController::class);
 
+        Route::resource('remaining-products',RemainingProductController::class);
+
     });
 
 Route::middleware(['auth', 'role:Owner'])
     ->group(function () {
         Route::resource('employees', EmployeeController::class)
             ->except(['show']);
+
+        Route::get(
+            '/financial-reports',
+            [FinancialReportController::class, 'index']
+        )->name('financial-reports.index');
+
     });
 
 

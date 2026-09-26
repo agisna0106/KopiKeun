@@ -36,4 +36,12 @@ class BaseDrink extends Model
             'base_drink_id'
         );
     }
+
+    public function remainingProductDetails(): HasMany
+    {
+        return $this->hasMany(
+            RemainingProductDetail::class,
+            'base_drink_id'
+        );
+    }
 }
