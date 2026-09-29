@@ -4,8 +4,8 @@
 
             {{-- Logo --}}
             <a href="{{ route('dashboard') }}" class="flex shrink-0 items-center gap-2">
-                <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-amber-900 text-sm font-bold text-white">
-                    K
+                <div class="flex h-16 w-16 items-center justify-center">
+                    <img src="{{ asset('images/logo_kopikeun.png') }}" alt="logo KopiKeun">
                 </div>
 
                 <div class="hidden sm:block">
