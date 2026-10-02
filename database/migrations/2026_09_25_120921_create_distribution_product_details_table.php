@@ -11,28 +11,30 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('remaining_product_details', function (Blueprint $table) {
+        Schema::create('distribution_product_details', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('remaining_product_id')
-                ->constrained('remaining_products')
+            $table->foreignId('distribution_id')
+                ->constrained('distributions')
                 ->cascadeOnDelete();
 
             $table->foreignId('base_drink_id')
                 ->constrained('base_drinks')
                 ->restrictOnDelete();
 
-            $table->decimal('quantity', 12, 2);
+            $table->integer('quantity_distributed');
+            $table->integer('quantity_returned')->default(0);
 
             $table->timestamps();
         });
     }
+
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('remaining_product_details');
+        Schema::dropIfExists('distribution_product_details');
     }
 };

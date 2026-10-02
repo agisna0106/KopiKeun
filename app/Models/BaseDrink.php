@@ -32,15 +32,7 @@ class BaseDrink extends Model
     public function distributionDetails(): HasMany
     {
         return $this->hasMany(
-            DistributionDetail::class,
-            'base_drink_id'
-        );
-    }
-
-    public function remainingProductDetails(): HasMany
-    {
-        return $this->hasMany(
-            RemainingProductDetail::class,
+            DistributionProductDetail::class,
             'base_drink_id'
         );
     }

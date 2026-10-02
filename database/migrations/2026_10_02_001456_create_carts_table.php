@@ -11,22 +11,21 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('base_drinks', function (Blueprint $table) {
+        Schema::create('carts', function (Blueprint $table) {
             $table->id();
+            $table->string('code')->unique();
             $table->string('name');
-            $table->decimal('bottle_capacity_ml', 8, 2)->default(1200);
-            $table->decimal('standard_serving_ml', 8, 2);
-            $table->string('status')->default('Active');
+            $table->string('description')->nullable();
+            $table->string('status')->default('active');
             $table->timestamps();
         });
     }
-
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('base_drinks');
+        Schema::dropIfExists('carts');
     }
 };

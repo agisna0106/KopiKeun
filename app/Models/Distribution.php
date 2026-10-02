@@ -2,17 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Distribution extends Model
 {
-    use HasFactory;
-
-    protected $table = 'distributions';
-
     protected $fillable = [
         'employee_id',
         'distribution_date',
@@ -25,14 +20,16 @@ class Distribution extends Model
 
     public function employee(): BelongsTo
     {
-        return $this->belongsTo(Employee::class, 'employee_id');
+        return $this->belongsTo(Employee::class);
     }
 
-    public function details(): HasMany
+    public function productDetails(): HasMany
     {
-        return $this->hasMany(
-            DistributionDetail::class,
-            'distribution_id'
-        );
+        return $this->hasMany(DistributionProductDetail::class);
+    }
+
+    public function operationalDetails(): HasMany
+    {
+        return $this->hasMany(DistributionOperationalDetail::class);
     }
 }

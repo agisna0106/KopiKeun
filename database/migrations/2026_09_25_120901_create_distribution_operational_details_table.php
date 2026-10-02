@@ -11,29 +11,29 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('distribution_details', function (Blueprint $table) {
+        Schema::create('distribution_operational_details', function (Blueprint $table) {
             $table->id();
 
             $table->foreignId('distribution_id')
                 ->constrained('distributions')
                 ->cascadeOnDelete();
 
-            $table->foreignId('base_drink_id')
-                ->constrained('base_drinks')
+            $table->foreignId('operational_item_id')
+                ->constrained('operational_items')
                 ->restrictOnDelete();
 
-            $table->decimal('quantity', 12, 2);
+            $table->integer('quantity_distributed');
+            $table->integer('quantity_returned')->default(0);
 
             $table->timestamps();
         });
     }
-
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('distribution_details');
+        Schema::dropIfExists('distribution_operational_details');
     }
 };

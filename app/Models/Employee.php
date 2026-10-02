@@ -8,11 +8,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Employee extends Model
 {
-    protected $table = 'employees';
-
     protected $fillable = [
         'user_id',
-        'employee_code',
+        'name',
         'phone',
         'address',
         'status',
@@ -23,11 +21,13 @@ class Employee extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function assignments(): HasMany
+    {
+        return $this->hasMany(Assignment::class);
+    }
+
     public function distributions(): HasMany
     {
-        return $this->hasMany(
-            Distribution::class,
-            'employee_id'
-        );
+        return $this->hasMany(Distribution::class);
     }
 }

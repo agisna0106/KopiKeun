@@ -11,10 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('remaining_products', function (Blueprint $table) {
+        Schema::create('operational_items', function (Blueprint $table) {
             $table->id();
-            $table->date('recorded_at');
-            $table->text('notes')->nullable();
+            $table->string('name');
+            $table->string('unit');
+            $table->integer('stock')->default(0);
+            $table->integer('minimum_stock')->default(0);
+            $table->string('status')->default('active');
             $table->timestamps();
         });
     }
@@ -24,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('remaining_products');
+        Schema::dropIfExists('operational_items');
     }
 };
