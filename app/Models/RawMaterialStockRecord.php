@@ -17,7 +17,7 @@ class RawMaterialStockRecord extends Model
     ];
 
     protected $casts = [
-        'stock' => 'decimal:2',
+        'stock' => 'integer',
         'recorded_at' => 'date',
     ];
 

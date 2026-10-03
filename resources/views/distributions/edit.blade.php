@@ -1,30 +1,29 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex w-full items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+        <div>
+            <h2 class="text-xl font-bold text-stone-900">
                 Edit Distribution
             </h2>
 
-            <a
-                href="{{ route('distributions.index') }}"
-                class="inline-flex items-center rounded-md bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-300"
-            >
-                Back
-            </a>
+            <p class="mt-1 text-sm text-stone-500">
+                Update distribution information and distributed items.
+            </p>
         </div>
     </x-slot>
 
     <div class="py-6">
-        <div class="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
 
-            {{-- Validation Errors --}}
             @if ($errors->any())
-                <div class="mb-6 rounded-md bg-red-50 p-4">
-                    <div class="text-sm font-medium text-red-800">
+                <div
+                    class="mb-6 rounded-xl border border-red-200
+                           bg-red-50 px-4 py-3 text-sm text-red-700"
+                >
+                    <p class="font-semibold">
                         Please fix the following errors:
-                    </div>
+                    </p>
 
-                    <ul class="mt-2 list-disc pl-5 text-sm text-red-700">
+                    <ul class="mt-2 list-disc space-y-1 pl-5">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
@@ -32,170 +31,565 @@
                 </div>
             @endif
 
+
             <form
-                method="POST"
                 action="{{ route('distributions.update', $distribution) }}"
+                method="POST"
+                id="distribution-form"
                 class="space-y-6"
             >
                 @csrf
                 @method('PUT')
 
+
+                {{-- ========================================================= --}}
                 {{-- Distribution Information --}}
-                <div class="rounded-lg bg-white p-6 shadow-sm">
+                {{-- ========================================================= --}}
 
-                    <h3 class="mb-4 text-lg font-semibold text-gray-800">
-                        Distribution Information
-                    </h3>
+                <x-app-card>
 
-                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    <div class="mb-5">
+                        <h3 class="text-base font-bold text-stone-900">
+                            Distribution Information
+                        </h3>
+
+                        <p class="mt-1 text-sm text-stone-500">
+                            Basic information about this distribution.
+                        </p>
+                    </div>
+
+                    <div class="grid gap-5 sm:grid-cols-2">
 
                         {{-- Employee --}}
                         <div>
-                            <x-input-label
+                            <label
                                 for="employee_id"
-                                value="Employee"
-                            />
+                                class="mb-1.5 block text-sm font-semibold text-stone-700"
+                            >
+                                Employee
+                            </label>
 
                             <select
                                 id="employee_id"
                                 name="employee_id"
                                 required
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
+                                class="w-full rounded-lg border-stone-300
+                                       text-sm shadow-sm
+                                       focus:border-amber-500
+                                       focus:ring-amber-500"
                             >
                                 <option value="">
-                                    Select Employee
+                                    Select employee
                                 </option>
 
                                 @foreach ($employees as $employee)
                                     <option
                                         value="{{ $employee->id }}"
-                                        {{ (string) old('employee_id', $distribution->employee_id) === (string) $employee->id ? 'selected' : '' }}
+                                        {{ old(
+                                            'employee_id',
+                                            $distribution->employee_id
+                                        ) == $employee->id ? 'selected' : '' }}
                                     >
+                                        {{ $employee->employee_code }}
+                                        -
                                         {{ $employee->user->name }}
-                                        - {{ $employee->employee_code }}
                                     </option>
                                 @endforeach
                             </select>
 
-                            <x-input-error
-                                :messages="$errors->get('employee_id')"
-                                class="mt-2"
-                            />
+                            @error('employee_id')
+                                <p class="mt-1 text-xs text-red-600">
+                                    {{ $message }}
+                                </p>
+                            @enderror
                         </div>
+
 
                         {{-- Distribution Date --}}
                         <div>
-                            <x-input-label
+                            <label
                                 for="distribution_date"
-                                value="Distribution Date"
-                            />
+                                class="mb-1.5 block text-sm font-semibold text-stone-700"
+                            >
+                                Distribution Date
+                            </label>
 
-                            <x-text-input
+                            <input
+                                type="date"
                                 id="distribution_date"
                                 name="distribution_date"
-                                type="date"
-                                class="mt-1 block w-full"
-                                value="{{ old('distribution_date', $distribution->distribution_date->format('Y-m-d')) }}"
+                                value="{{ old(
+                                    'distribution_date',
+                                    $distribution->distribution_date->toDateString()
+                                ) }}"
                                 required
-                            />
+                                class="w-full rounded-lg border-stone-300
+                                       text-sm shadow-sm
+                                       focus:border-amber-500
+                                       focus:ring-amber-500"
+                            >
 
-                            <x-input-error
-                                :messages="$errors->get('distribution_date')"
-                                class="mt-2"
-                            />
-                        </div>
-
-                        {{-- Notes --}}
-                        <div class="md:col-span-2">
-                            <x-input-label
-                                for="notes"
-                                value="Notes"
-                            />
-
-                            <textarea
-                                id="notes"
-                                name="notes"
-                                rows="3"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
-                                placeholder="Optional notes"
-                            >{{ old('notes', $distribution->notes) }}</textarea>
-
-                            <x-input-error
-                                :messages="$errors->get('notes')"
-                                class="mt-2"
-                            />
+                            @error('distribution_date')
+                                <p class="mt-1 text-xs text-red-600">
+                                    {{ $message }}
+                                </p>
+                            @enderror
                         </div>
 
                     </div>
-                </div>
 
+
+                    {{-- Notes --}}
+                    <div class="mt-5">
+
+                        <label
+                            for="notes"
+                            class="mb-1.5 block text-sm font-semibold text-stone-700"
+                        >
+                            Notes
+                        </label>
+
+                        <textarea
+                            id="notes"
+                            name="notes"
+                            rows="3"
+                            class="w-full rounded-lg border-stone-300
+                                   text-sm shadow-sm
+                                   focus:border-amber-500
+                                   focus:ring-amber-500"
+                        >{{ old('notes', $distribution->notes) }}</textarea>
+
+                        @error('notes')
+                            <p class="mt-1 text-xs text-red-600">
+                                {{ $message }}
+                            </p>
+                        @enderror
+
+                    </div>
+
+                </x-app-card>
+
+
+                {{-- ========================================================= --}}
                 {{-- Base Drinks --}}
-                <div class="rounded-lg bg-white p-6 shadow-sm">
+                {{-- ========================================================= --}}
 
-                    <div class="mb-4 flex items-center justify-between">
+                <x-app-card>
+
+                    <div
+                        class="flex flex-col gap-3
+                               sm:flex-row sm:items-center
+                               sm:justify-between"
+                    >
 
                         <div>
-                            <h3 class="text-lg font-semibold text-gray-800">
+                            <h3 class="text-base font-bold text-stone-900">
                                 Base Drinks
                             </h3>
 
-                            <p class="mt-1 text-sm text-gray-500">
-                                Enter the estimated number of servings distributed.
+                            <p class="mt-1 text-sm text-stone-500">
+                                Base drinks do not affect stock.
                             </p>
                         </div>
 
                         <button
                             type="button"
-                            id="add-base-drink"
-                            class="inline-flex items-center rounded-md px-4 py-2 text-sm font-semibold text-white shadow-sm hover:opacity-90"
-                            style="background-color: #ea580c; color: white;"
+                            id="add-product"
+                            class="rounded-lg bg-amber-700 px-3 py-2
+                                   text-xs font-semibold text-white
+                                   hover:bg-amber-800"
                         >
                             Add Base Drink
                         </button>
 
                     </div>
 
+
                     <div
-                        id="base-drink-list"
-                        class="space-y-4"
-                    ></div>
+                        id="products-container"
+                        class="mt-5 space-y-3"
+                    >
 
-                    {{-- Total Estimated Servings --}}
-                    <div class="mt-6 flex justify-end border-t pt-4">
+                        @foreach ($distribution->productDetails as $index => $detail)
 
-                        <div class="text-right">
-
-                            <p class="text-sm text-gray-500">
-                                Total Estimated Servings
-                            </p>
-
-                            <p
-                                id="total-quantity"
-                                class="text-2xl font-bold text-gray-900"
+                            <div
+                                class="product-row rounded-lg
+                                       border border-stone-200 p-4"
                             >
-                                0
-                            </p>
 
-                        </div>
+                                <div
+                                    class="grid gap-3
+                                           sm:grid-cols-[1fr_150px_150px_auto]"
+                                >
+
+                                    {{-- Base Drink --}}
+                                    <div>
+
+                                        <label
+                                            class="mb-1 block text-xs font-semibold text-stone-600"
+                                        >
+                                            Base Drink
+                                        </label>
+
+                                        <select
+                                            name="products[{{ $index }}][id]"
+                                            class="hidden"
+                                        >
+                                            <option value="{{ $detail->id }}">
+                                                {{ $detail->id }}
+                                            </option>
+                                        </select>
+
+                                        <select
+                                            name="products[{{ $index }}][base_drink_id]"
+                                            required
+                                            class="w-full rounded-lg border-stone-300
+                                                   text-sm shadow-sm
+                                                   focus:border-amber-500
+                                                   focus:ring-amber-500"
+                                        >
+                                            @foreach ($baseDrinks as $baseDrink)
+
+                                                <option
+                                                    value="{{ $baseDrink->id }}"
+                                                    {{ $detail->base_drink_id == $baseDrink->id ? 'selected' : '' }}
+                                                >
+                                                    {{ $baseDrink->name }}
+                                                </option>
+
+                                            @endforeach
+                                        </select>
+
+                                    </div>
+
+
+                                    {{-- Distributed --}}
+                                    <div>
+
+                                        <label
+                                            class="mb-1 block text-xs font-semibold text-stone-600"
+                                        >
+                                            Distributed
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            step="1"
+                                            min="1"
+                                            name="products[{{ $index }}][quantity_distributed]"
+                                            value="{{ old(
+                                                "products.$index.quantity_distributed",
+                                                (int) $detail->quantity_distributed
+                                            ) }}"
+                                            required
+                                            class="w-full rounded-lg border-stone-300
+                                                   text-sm shadow-sm
+                                                   focus:border-amber-500
+                                                   focus:ring-amber-500"
+                                        >
+
+                                    </div>
+
+
+                                    {{-- Returned --}}
+                                    <div>
+
+                                        <label
+                                            class="mb-1 block text-xs font-semibold text-stone-600"
+                                        >
+                                            Returned
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            step="1"
+                                            min="0"
+                                            name="products[{{ $index }}][quantity_returned]"
+                                            value="{{ old(
+                                                "products.$index.quantity_returned",
+                                                (int) $detail->quantity_returned
+                                            ) }}"
+                                            required
+                                            class="w-full rounded-lg border-stone-300
+                                                   text-sm shadow-sm
+                                                   focus:border-amber-500
+                                                   focus:ring-amber-500"
+                                        >
+
+                                    </div>
+
+
+                                    {{-- Remove --}}
+                                    <div class="flex items-end">
+
+                                        <button
+                                            type="button"
+                                            class="remove-product w-full rounded-lg
+                                                   bg-red-50 px-3 py-2
+                                                   text-xs font-semibold text-red-600
+                                                   hover:bg-red-100
+                                                   sm:w-auto"
+                                        >
+                                            Remove
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        @endforeach
 
                     </div>
 
-                </div>
 
-                {{-- Buttons --}}
-                <div class="flex items-center justify-end gap-3 border-t pt-6">
+                    <div
+                        id="products-empty"
+                        class="mt-5 rounded-lg border border-dashed
+                               border-stone-300 px-4 py-6 text-center
+                               {{ $distribution->productDetails->isNotEmpty()
+                                    ? 'hidden'
+                                    : '' }}"
+                    >
+                        <p class="text-sm font-medium text-stone-600">
+                            No base drinks added.
+                        </p>
+
+                        <p class="mt-1 text-xs text-stone-500">
+                            Click "Add Base Drink" to add an item.
+                        </p>
+                    </div>
+
+                </x-app-card>
+
+
+                {{-- ========================================================= --}}
+                {{-- Operational Items --}}
+                {{-- ========================================================= --}}
+
+                <x-app-card>
+
+                    <div
+                        class="flex flex-col gap-3
+                               sm:flex-row sm:items-center
+                               sm:justify-between"
+                    >
+
+                        <div>
+                            <h3 class="text-base font-bold text-stone-900">
+                                Operational Items
+                            </h3>
+
+                            <p class="mt-1 text-sm text-stone-500">
+                                Changes will be reflected in operational item stock.
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            id="add-operational-item"
+                            class="rounded-lg bg-amber-700 px-3 py-2
+                                   text-xs font-semibold text-white
+                                   hover:bg-amber-800"
+                        >
+                            Add Operational Item
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        id="operational-items-container"
+                        class="mt-5 space-y-3"
+                    >
+
+                        @foreach (
+                            $distribution->operationalDetails
+                            as $index => $detail
+                        )
+
+                            <div
+                                class="operational-item-row rounded-lg
+                                       border border-stone-200 p-4"
+                            >
+
+                                <div
+                                    class="grid gap-3
+                                           sm:grid-cols-[1fr_150px_150px_auto]"
+                                >
+
+                                    {{-- Item --}}
+                                    <div>
+
+                                        <label
+                                            class="mb-1 block text-xs font-semibold text-stone-600"
+                                        >
+                                            Operational Item
+                                        </label>
+
+                                        <input
+                                            type="hidden"
+                                            name="operational_items[{{ $index }}][id]"
+                                            value="{{ $detail->id }}"
+                                        >
+
+                                        <select
+                                            name="operational_items[{{ $index }}][operational_item_id]"
+                                            required
+                                            class="operational-item-select w-full
+                                                   rounded-lg border-stone-300
+                                                   text-sm shadow-sm
+                                                   focus:border-amber-500
+                                                   focus:ring-amber-500"
+                                        >
+
+                                            @foreach ($operationalItems as $operationalItem)
+
+                                                <option
+                                                    value="{{ $operationalItem->id }}"
+                                                    data-stock="{{ $operationalItem->stock }}"
+                                                    {{ $detail->operational_item_id == $operationalItem->id ? 'selected' : '' }}
+                                                >
+                                                    {{ $operationalItem->name }}
+                                                    (Stock:
+                                                    {{ $operationalItem->stock }}
+                                                    {{ $operationalItem->unit }})
+                                                </option>
+
+                                            @endforeach
+
+                                        </select>
+
+                                        <p class="operational-stock mt-1 text-xs text-stone-500">
+                                            Available stock:
+                                            {{ $detail->operationalItem->stock ?? 0 }}
+                                            {{ $detail->operationalItem->unit ?? '' }}
+                                        </p>
+
+                                    </div>
+
+
+                                    {{-- Distributed --}}
+                                    <div>
+
+                                        <label
+                                            class="mb-1 block text-xs font-semibold text-stone-600"
+                                        >
+                                            Distributed
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            name="operational_items[{{ $index }}][quantity_distributed]"
+                                            value="{{ old(
+                                                "operational_items.$index.quantity_distributed",
+                                                (int) $detail->quantity_distributed
+                                            ) }}"
+                                            required
+                                            class="operational-quantity w-full
+                                                   rounded-lg border-stone-300
+                                                   text-sm shadow-sm
+                                                   focus:border-amber-500
+                                                   focus:ring-amber-500"
+                                        >
+
+                                    </div>
+
+
+                                    {{-- Returned --}}
+                                    <div>
+
+                                        <label
+                                            class="mb-1 block text-xs font-semibold text-stone-600"
+                                        >
+                                            Returned
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            min="0"
+                                            name="operational_items[{{ $index }}][quantity_returned]"
+                                            value="{{ old(
+                                                "operational_items.$index.quantity_returned",
+                                                (int) $detail->quantity_returned
+                                            ) }}"
+                                            required
+                                            class="w-full rounded-lg border-stone-300
+                                                   text-sm shadow-sm
+                                                   focus:border-amber-500
+                                                   focus:ring-amber-500"
+                                        >
+
+                                    </div>
+
+
+                                    {{-- Remove --}}
+                                    <div class="flex items-end">
+
+                                        <button
+                                            type="button"
+                                            class="remove-operational-item w-full
+                                                   rounded-lg bg-red-50 px-3 py-2
+                                                   text-xs font-semibold text-red-600
+                                                   hover:bg-red-100
+                                                   sm:w-auto"
+                                        >
+                                            Remove
+                                        </button>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        @endforeach
+
+                    </div>
+
+
+                    <div
+                        id="operational-items-empty"
+                        class="mt-5 rounded-lg border border-dashed
+                               border-stone-300 px-4 py-6 text-center
+                               {{ $distribution->operationalDetails->isNotEmpty()
+                                    ? 'hidden'
+                                    : '' }}"
+                    >
+                        <p class="text-sm font-medium text-stone-600">
+                            No operational items added.
+                        </p>
+
+                        <p class="mt-1 text-xs text-stone-500">
+                            Click "Add Operational Item" to add an item.
+                        </p>
+                    </div>
+
+                </x-app-card>
+
+
+                {{-- ========================================================= --}}
+                {{-- Actions --}}
+                {{-- ========================================================= --}}
+
+                <div class="flex items-center justify-end gap-3">
 
                     <a
-                        href="{{ route('distributions.index') }}"
-                        class="inline-flex items-center rounded-md bg-gray-200 px-5 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-300"
+                        href="{{ route('distributions.show', $distribution) }}"
+                        class="rounded-lg bg-stone-100 px-4 py-2
+                               text-sm font-semibold text-stone-700
+                               hover:bg-stone-200"
                     >
                         Cancel
                     </a>
 
                     <button
                         type="submit"
-                        class="inline-flex items-center rounded-md px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:opacity-90"
-                        style="background-color: #ea580c; color: white;"
+                        class="rounded-lg bg-amber-700 px-5 py-2
+                               text-sm font-semibold text-white
+                               hover:bg-amber-800"
                     >
                         Update Distribution
                     </button>
@@ -207,286 +601,431 @@
         </div>
     </div>
 
+
+    {{-- ============================================================= --}}
+    {{-- JavaScript --}}
+    {{-- ============================================================= --}}
+
     <script>
-        const baseDrinks = @js(
-            $baseDrinks->map(function ($baseDrink) {
-                return [
-                    'id' => $baseDrink->id,
-                    'name' => $baseDrink->name,
-                    'bottle_capacity_ml' => (float) $baseDrink->bottle_capacity_ml,
-                    'standard_serving_ml' => (float) $baseDrink->standard_serving_ml,
-                ];
-            })->values()
-        );
 
-        const existingDetails = @js(
-            $distribution->details->map(function ($detail) {
-                return [
-                    'base_drink_id' => $detail->base_drink_id,
-                    'quantity' => (float) $detail->quantity,
-                ];
-            })->values()
-        );
+        let productIndex =
+            {{ $distribution->productDetails->count() }};
 
-        const baseDrinkList =
-            document.getElementById('base-drink-list');
+        let operationalItemIndex =
+            {{ $distribution->operationalDetails->count() }};
 
-        const addBaseDrinkButton =
-            document.getElementById('add-base-drink');
 
-        const totalQuantityElement =
-            document.getElementById('total-quantity');
+        /*
+        |--------------------------------------------------------------------------
+        | Base Drinks
+        |--------------------------------------------------------------------------
+        */
 
+        const addProductButton =
+            document.getElementById('add-product');
 
-        // Calculate total estimated servings
-        function updateTotalQuantity() {
+        const productsContainer =
+            document.getElementById('products-container');
 
-            let total = 0;
+        const productsEmpty =
+            document.getElementById('products-empty');
 
-            document
-                .querySelectorAll('.quantity-input')
-                .forEach(input => {
 
-                    total += parseFloat(input.value) || 0;
-
-                });
-
-            totalQuantityElement.textContent =
-                new Intl.NumberFormat('id-ID').format(total);
-        }
-
-
-        // Prevent duplicate Base Drink selection
-        function updateBaseDrinkOptions() {
-
-            const selectedValues = Array.from(
-                document.querySelectorAll('.base-drink-select')
-            )
-                .map(select => select.value)
-                .filter(value => value !== '');
-
-            document
-                .querySelectorAll('.base-drink-select')
-                .forEach(select => {
-
-                    const currentValue = select.value;
-
-                    Array.from(select.options).forEach(option => {
-
-                        if (option.value === '') {
-                            return;
-                        }
-
-                        option.disabled =
-                            selectedValues.includes(option.value) &&
-                            option.value !== currentValue;
-
-                    });
-
-                });
-        }
-
-
-        // Create Base Drink row
-        function createBaseDrinkRow(
-            baseDrinkId = '',
-            quantity = 1
-        ) {
-
-            const index =
-                document.querySelectorAll('.base-drink-row').length;
-
-            const row =
-                document.createElement('div');
-
-            row.className =
-                'base-drink-row rounded-lg border border-gray-200 p-4';
-
-            row.innerHTML = `
-                <div class="grid grid-cols-1 gap-4 md:grid-cols-12 md:items-end">
-
-                    {{-- Base Drink --}}
-                    <div class="md:col-span-7">
-
-                        <label class="block text-sm font-medium text-gray-700">
-                            Base Drink
-                        </label>
-
-                        <select
-                            name="base_drinks[${index}][base_drink_id]"
-                            class="base-drink-select mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
-                            required
-                        >
-                            <option value="">
-                                Select Base Drink
-                            </option>
-                        </select>
-
-                    </div>
-
-
-                    {{-- Quantity --}}
-                    <div class="md:col-span-3">
-
-                        <label class="block text-sm font-medium text-gray-700">
-                            Estimated Servings
-                        </label>
-
-                        <input
-                            type="number"
-                            name="base_drinks[${index}][quantity]"
-                            value="${quantity}"
-                            min="0.01"
-                            step="0.01"
-                            class="quantity-input mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-orange-500 focus:ring-orange-500"
-                            required
-                        >
-
-                    </div>
-
-
-                    {{-- Remove --}}
-                    <div class="md:col-span-2">
-
-                        <button
-                            type="button"
-                            class="remove-base-drink w-full rounded-md bg-red-100 px-3 py-2 text-sm font-semibold text-red-700 hover:bg-red-200"
-                        >
-                            Remove
-                        </button>
-
-                    </div>
-
-                </div>
-
-                <div class="mt-3 text-xs text-gray-500 base-drink-info">
-                    Select a base drink to see its serving information.
-                </div>
-            `;
-
-
-            const select =
-                row.querySelector('.base-drink-select');
-
-            const quantityInput =
-                row.querySelector('.quantity-input');
-
-            const info =
-                row.querySelector('.base-drink-info');
-
-            const removeButton =
-                row.querySelector('.remove-base-drink');
-
-
-            // Populate Base Drink options
-            baseDrinks.forEach(baseDrink => {
-
-                const option =
-                    document.createElement('option');
-
-                option.value =
-                    baseDrink.id;
-
-                option.textContent =
-                    baseDrink.name;
-
-                if (
-                    String(baseDrink.id) ===
-                    String(baseDrinkId)
-                ) {
-                    option.selected = true;
-                }
-
-                select.appendChild(option);
-
-            });
-
-
-            // Update Base Drink information
-            function updateInfo() {
-
-                const selected =
-                    baseDrinks.find(
-                        baseDrink =>
-                            String(baseDrink.id) ===
-                            String(select.value)
-                    );
-
-                if (!selected) {
-
-                    info.textContent =
-                        'Select a base drink to see its serving information.';
-
-                    return;
-                }
-
-                info.textContent =
-                    `Bottle capacity: ${selected.bottle_capacity_ml} ml | ` +
-                    `Standard serving: ${selected.standard_serving_ml} ml`;
-
-                updateBaseDrinkOptions();
-            }
-
-
-            select.addEventListener(
-                'change',
-                updateInfo
-            );
-
-
-            quantityInput.addEventListener(
-                'input',
-                updateTotalQuantity
-            );
-
-
-            removeButton.addEventListener(
-                'click',
-                () => {
-
-                    row.remove();
-
-                    updateTotalQuantity();
-                    updateBaseDrinkOptions();
-
-                }
-            );
-
-
-            baseDrinkList.appendChild(row);
-
-            updateInfo();
-            updateBaseDrinkOptions();
-        }
-
-
-        // Add Base Drink
-        addBaseDrinkButton.addEventListener(
+        addProductButton.addEventListener(
             'click',
             () => {
-                createBaseDrinkRow();
+
+                const row =
+                    document.createElement('div');
+
+                row.className =
+                    'product-row rounded-lg border border-stone-200 p-4';
+
+                row.innerHTML = `
+                    <div class="grid gap-3
+                                sm:grid-cols-[1fr_150px_150px_auto]">
+
+                        <div>
+
+                            <label
+                                class="mb-1 block text-xs font-semibold text-stone-600"
+                            >
+                                Base Drink
+                            </label>
+
+                            <select
+                                name="products[${productIndex}][base_drink_id]"
+                                required
+                                class="w-full rounded-lg border-stone-300
+                                       text-sm shadow-sm
+                                       focus:border-amber-500
+                                       focus:ring-amber-500"
+                            >
+
+                                <option value="">
+                                    Select base drink
+                                </option>
+
+                                @foreach ($baseDrinks as $baseDrink)
+
+                                    <option value="{{ $baseDrink->id }}">
+                                        {{ $baseDrink->name }}
+                                    </option>
+
+                                @endforeach
+
+                            </select>
+
+                        </div>
+
+
+                        <div>
+
+                            <label
+                                class="mb-1 block text-xs font-semibold text-stone-600"
+                            >
+                                Distributed
+                            </label>
+
+                            <input
+                                type="number"
+                                step="1"
+                                min="1"
+                                name="products[${productIndex}][quantity_distributed]"
+                                required
+                                class="w-full rounded-lg border-stone-300
+                                       text-sm shadow-sm
+                                       focus:border-amber-500
+                                       focus:ring-amber-500"
+                            >
+
+                        </div>
+
+
+                        <div>
+
+                            <label
+                                class="mb-1 block text-xs font-semibold text-stone-600"
+                            >
+                                Returned
+                            </label>
+
+                            <input
+                                type="number"
+                                step="1"
+                                min="0"
+                                name="products[${productIndex}][quantity_returned]"
+                                value="0"
+                                required
+                                class="w-full rounded-lg border-stone-300
+                                       text-sm shadow-sm
+                                       focus:border-amber-500
+                                       focus:ring-amber-500"
+                            >
+
+                        </div>
+
+
+                        <div class="flex items-end">
+
+                            <button
+                                type="button"
+                                class="remove-product w-full rounded-lg
+                                       bg-red-50 px-3 py-2
+                                       text-xs font-semibold text-red-600
+                                       hover:bg-red-100
+                                       sm:w-auto"
+                            >
+                                Remove
+                            </button>
+
+                        </div>
+
+                    </div>
+                `;
+
+                productsContainer.appendChild(row);
+
+                productIndex++;
+
+                updateProductEmptyState();
             }
         );
 
 
-        // Load existing distribution details
-        existingDetails.forEach(detail => {
+        document.addEventListener(
+            'click',
+            (event) => {
 
-            createBaseDrinkRow(
-                detail.base_drink_id,
-                detail.quantity
+                if (
+                    event.target.classList.contains(
+                        'remove-product'
+                    )
+                ) {
+
+                    event.target
+                        .closest('.product-row')
+                        .remove();
+
+                    updateProductEmptyState();
+                }
+
+            }
+        );
+
+
+        function updateProductEmptyState()
+        {
+            const hasRows =
+                productsContainer.querySelector(
+                    '.product-row'
+                );
+
+            productsEmpty.classList.toggle(
+                'hidden',
+                !!hasRows
             );
-
-        });
-
-
-        // Create an empty row if there are no details
-        if (existingDetails.length === 0) {
-            createBaseDrinkRow();
         }
 
 
-        // Initial total
-        updateTotalQuantity();
+        /*
+        |--------------------------------------------------------------------------
+        | Operational Items
+        |--------------------------------------------------------------------------
+        */
+
+        const addOperationalItemButton =
+            document.getElementById(
+                'add-operational-item'
+            );
+
+        const operationalItemsContainer =
+            document.getElementById(
+                'operational-items-container'
+            );
+
+        const operationalItemsEmpty =
+            document.getElementById(
+                'operational-items-empty'
+            );
+
+
+        addOperationalItemButton.addEventListener(
+            'click',
+            () => {
+
+                const row =
+                    document.createElement('div');
+
+                row.className =
+                    'operational-item-row rounded-lg border border-stone-200 p-4';
+
+                row.innerHTML = `
+                    <div class="grid gap-3
+                                sm:grid-cols-[1fr_150px_150px_auto]">
+
+                        <div>
+
+                            <label
+                                class="mb-1 block text-xs font-semibold text-stone-600"
+                            >
+                                Operational Item
+                            </label>
+
+                            <select
+                                name="operational_items[${operationalItemIndex}][operational_item_id]"
+                                required
+                                class="operational-item-select w-full
+                                       rounded-lg border-stone-300
+                                       text-sm shadow-sm
+                                       focus:border-amber-500
+                                       focus:ring-amber-500"
+                            >
+
+                                <option value="">
+                                    Select item
+                                </option>
+
+                                @foreach ($operationalItems as $operationalItem)
+
+                                    <option
+                                        value="{{ $operationalItem->id }}"
+                                        data-stock="{{ $operationalItem->stock }}"
+                                    >
+                                        {{ $operationalItem->name }}
+                                        (Stock:
+                                        {{ $operationalItem->stock }}
+                                        {{ $operationalItem->unit }})
+                                    </option>
+
+                                @endforeach
+
+                            </select>
+
+                            <p class="operational-stock mt-1 text-xs text-stone-500">
+                            </p>
+
+                        </div>
+
+
+                        <div>
+
+                            <label
+                                class="mb-1 block text-xs font-semibold text-stone-600"
+                            >
+                                Distributed
+                            </label>
+
+                            <input
+                                type="number"
+                                min="1"
+                                name="operational_items[${operationalItemIndex}][quantity_distributed]"
+                                required
+                                class="operational-quantity w-full
+                                       rounded-lg border-stone-300
+                                       text-sm shadow-sm
+                                       focus:border-amber-500
+                                       focus:ring-amber-500"
+                            >
+
+                        </div>
+
+
+                        <div>
+
+                            <label
+                                class="mb-1 block text-xs font-semibold text-stone-600"
+                            >
+                                Returned
+                            </label>
+
+                            <input
+                                type="number"
+                                min="0"
+                                name="operational_items[${operationalItemIndex}][quantity_returned]"
+                                value="0"
+                                required
+                                class="w-full rounded-lg border-stone-300
+                                       text-sm shadow-sm
+                                       focus:border-amber-500
+                                       focus:ring-amber-500"
+                            >
+
+                        </div>
+
+
+                        <div class="flex items-end">
+
+                            <button
+                                type="button"
+                                class="remove-operational-item w-full
+                                       rounded-lg bg-red-50 px-3 py-2
+                                       text-xs font-semibold text-red-600
+                                       hover:bg-red-100
+                                       sm:w-auto"
+                            >
+                                Remove
+                            </button>
+
+                        </div>
+
+                    </div>
+                `;
+
+                operationalItemsContainer.appendChild(row);
+
+                operationalItemIndex++;
+
+                updateOperationalItemEmptyState();
+            }
+        );
+
+
+        document.addEventListener(
+            'click',
+            (event) => {
+
+                if (
+                    event.target.classList.contains(
+                        'remove-operational-item'
+                    )
+                ) {
+
+                    event.target
+                        .closest('.operational-item-row')
+                        .remove();
+
+                    updateOperationalItemEmptyState();
+                }
+
+            }
+        );
+
+
+        document.addEventListener(
+            'change',
+            (event) => {
+
+                if (
+                    event.target.classList.contains(
+                        'operational-item-select'
+                    )
+                ) {
+
+                    const select =
+                        event.target;
+
+                    const row =
+                        select.closest(
+                            '.operational-item-row'
+                        );
+
+                    const stockDisplay =
+                        row.querySelector(
+                            '.operational-stock'
+                        );
+
+                    const selectedOption =
+                        select.options[
+                            select.selectedIndex
+                        ];
+
+                    if (
+                        selectedOption &&
+                        selectedOption.dataset.stock
+                    ) {
+
+                        stockDisplay.textContent =
+                            `Available stock: ${
+                                selectedOption.dataset.stock
+                            }`;
+
+                    } else {
+
+                        stockDisplay.textContent =
+                            '';
+
+                    }
+
+                }
+
+            }
+        );
+
+
+        function updateOperationalItemEmptyState()
+        {
+            const hasRows =
+                operationalItemsContainer.querySelector(
+                    '.operational-item-row'
+                );
+
+            operationalItemsEmpty.classList.toggle(
+                'hidden',
+                !!hasRows
+            );
+        }
+
     </script>
+
 </x-app-layout>

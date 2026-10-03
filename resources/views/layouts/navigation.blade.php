@@ -31,7 +31,7 @@
                 </a>
 
                 {{-- Owner & Admin --}}
-                @if(in_array(auth()->user()->role?->nama_role, ['Owner', 'Admin']))
+                @if(in_array(auth()->user()->role?->nama_role, ['Owner', 'Staff Operasional']))
 
                     {{-- Master Data --}}
                     <div class="relative group">
@@ -83,6 +83,30 @@
                                 class="block rounded-lg px-3 py-2 text-sm text-stone-600 hover:bg-stone-100 hover:text-stone-900"
                             >
                                 Bahan Baku
+                            </a>
+
+                            {{-- Carts --}}
+                            <a
+                                href="{{ route('carts.index') }}"
+                                class="block rounded-lg px-3 py-2 text-sm text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+                            >
+                                Gerobak
+                            </a>
+
+                            {{-- Regions --}}
+                            <a
+                                href="{{ route('regions.index') }}"
+                                class="block rounded-lg px-3 py-2 text-sm text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+                            >
+                                Wilayah
+                            </a>
+
+                            {{-- Operational Items --}}
+                            <a
+                                href="{{ route('operational-items.index') }}"
+                                class="block rounded-lg px-3 py-2 text-sm text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+                            >
+                                Barang Operasional
                             </a>
 
                         </div>
@@ -156,12 +180,22 @@
                         <div
                             class="invisible absolute left-0 top-full z-50 w-56 rounded-xl border border-stone-200 bg-white p-1 opacity-0 shadow-lg transition-all group-hover:visible group-hover:opacity-100"
                         >
+                            @if(auth()->user()->role?->nama_role === 'Staff Operasional')
+
+                            @endif
 
                             <a
                                 href="{{ route('sales.index') }}"
                                 class="block rounded-lg px-3 py-2 text-sm text-stone-600 hover:bg-stone-100 hover:text-stone-900"
                             >
                                 Penjualan
+                            </a>
+
+                            <a
+                                href="{{ route('assignments.index') }}"
+                                class="block rounded-lg px-3 py-2 text-sm text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+                            >
+                                Penugasan
                             </a>
 
                             <a

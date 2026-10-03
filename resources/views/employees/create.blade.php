@@ -6,7 +6,7 @@
             </h2>
 
             <p class="mt-1 text-sm text-stone-500">
-                Add an employee from an existing Karyawan account.
+                Create an account and employee profile for operational staff.
             </p>
         </div>
     </x-slot>
@@ -19,46 +19,180 @@
                 <form
                     method="POST"
                     action="{{ route('employees.store') }}"
-                    class="space-y-5"
+                    class="space-y-6"
                 >
                     @csrf
 
-                    {{-- User --}}
+                    {{-- ========================================= --}}
+                    {{-- ACCOUNT INFORMATION --}}
+                    {{-- ========================================= --}}
+
+                    <div>
+                        <h3 class="text-lg font-semibold text-stone-900">
+                            Account Information
+                        </h3>
+
+                        <p class="mt-1 text-sm text-stone-500">
+                            Information used by the employee to log in to the system.
+                        </p>
+                    </div>
+
+                    {{-- Name --}}
                     <div>
                         <label
-                            for="user_id"
+                            for="name"
                             class="block text-sm font-medium text-stone-700"
                         >
-                            Employee User
+                            Name
+                        </label>
+
+                        <input
+                            type="text"
+                            name="name"
+                            id="name"
+                            value="{{ old('name') }}"
+                            placeholder="e.g. Budi Santoso"
+                            required
+                            autofocus
+                            class="mt-1 block w-full rounded-lg border-stone-300
+                                   shadow-sm focus:border-amber-600
+                                   focus:ring-amber-600"
+                        >
+
+                        @error('name')
+                            <p class="mt-1 text-sm text-red-600">
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+
+                    {{-- Email --}}
+                    <div>
+                        <label
+                            for="email"
+                            class="block text-sm font-medium text-stone-700"
+                        >
+                            Email
+                        </label>
+
+                        <input
+                            type="email"
+                            name="email"
+                            id="email"
+                            value="{{ old('email') }}"
+                            placeholder="e.g. budi@kopikeun.test"
+                            required
+                            class="mt-1 block w-full rounded-lg border-stone-300
+                                   shadow-sm focus:border-amber-600
+                                   focus:ring-amber-600"
+                        >
+
+                        @error('email')
+                            <p class="mt-1 text-sm text-red-600">
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+
+                    {{-- Password --}}
+                    <div>
+                        <label
+                            for="password"
+                            class="block text-sm font-medium text-stone-700"
+                        >
+                            Password
+                        </label>
+
+                        <input
+                            type="password"
+                            name="password"
+                            id="password"
+                            required
+                            class="mt-1 block w-full rounded-lg border-stone-300
+                                   shadow-sm focus:border-amber-600
+                                   focus:ring-amber-600"
+                        >
+
+                        @error('password')
+                            <p class="mt-1 text-sm text-red-600">
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+
+                    {{-- Confirm Password --}}
+                    <div>
+                        <label
+                            for="password_confirmation"
+                            class="block text-sm font-medium text-stone-700"
+                        >
+                            Confirm Password
+                        </label>
+
+                        <input
+                            type="password"
+                            name="password_confirmation"
+                            id="password_confirmation"
+                            required
+                            class="mt-1 block w-full rounded-lg border-stone-300
+                                   shadow-sm focus:border-amber-600
+                                   focus:ring-amber-600"
+                        >
+                    </div>
+
+                    {{-- Role --}}
+                    <div>
+                        <label
+                            for="role_id"
+                            class="block text-sm font-medium text-stone-700"
+                        >
+                            Role
                         </label>
 
                         <select
-                            name="user_id"
-                            id="user_id"
+                            name="role_id"
+                            id="role_id"
                             required
                             class="mt-1 block w-full rounded-lg border-stone-300
                                    shadow-sm focus:border-amber-600
                                    focus:ring-amber-600"
                         >
                             <option value="">
-                                Select Employee User
+                                Select Role
                             </option>
 
-                            @foreach ($users as $user)
+                            @foreach ($roles as $role)
                                 <option
-                                    value="{{ $user->id }}"
-                                    {{ old('user_id') == $user->id ? 'selected' : '' }}
+                                    value="{{ $role->id_role }}"
+                                    {{ old('role_id') == $role->id_role ? 'selected' : '' }}
                                 >
-                                    {{ $user->name }} — {{ $user->email }}
+                                    {{ $role->nama_role }}
                                 </option>
                             @endforeach
                         </select>
 
-                        @error('user_id')
+                        @error('role_id')
                             <p class="mt-1 text-sm text-red-600">
                                 {{ $message }}
                             </p>
                         @enderror
+                    </div>
+
+
+                    {{-- ========================================= --}}
+                    {{-- EMPLOYEE INFORMATION --}}
+                    {{-- ========================================= --}}
+
+                    <div class="border-t border-stone-200 pt-6">
+
+                        <h3 class="text-lg font-semibold text-stone-900">
+                            Employee Information
+                        </h3>
+
+                        <p class="mt-1 text-sm text-stone-500">
+                            Information related to the employee profile.
+                        </p>
+
                     </div>
 
                     {{-- Employee Code --}}
@@ -129,6 +263,7 @@
                             name="address"
                             id="address"
                             rows="3"
+                            placeholder="Enter employee address"
                             class="mt-1 block w-full rounded-lg border-stone-300
                                    shadow-sm focus:border-amber-600
                                    focus:ring-amber-600"
@@ -180,8 +315,13 @@
                         @enderror
                     </div>
 
-                    {{-- Buttons --}}
-                    <div class="flex flex-col gap-2 sm:flex-row">
+
+                    {{-- ========================================= --}}
+                    {{-- BUTTONS --}}
+                    {{-- ========================================= --}}
+
+                    <div class="flex flex-col gap-2 border-t border-stone-200 pt-6 sm:flex-row">
+
                         <button
                             type="submit"
                             class="inline-flex justify-center rounded-lg
@@ -201,6 +341,7 @@
                         >
                             Cancel
                         </a>
+
                     </div>
 
                 </form>

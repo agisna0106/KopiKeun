@@ -14,7 +14,6 @@ use App\Models\Sale;
 use App\Models\Distribution;
 use App\Models\Employee;
 use App\Models\RawMaterial;
-use App\Models\RemainingProduct;
 
 class DashboardController extends Controller
 {
@@ -154,7 +153,7 @@ class DashboardController extends Controller
         }
 
 
-        if ($role === 'Admin') {
+        if ($role === 'Staff Operasional') {
 
 
             $activeProducts = Product::where('status', 'Active')->count();
@@ -179,7 +178,8 @@ class DashboardController extends Controller
 
             $recentDistributions = Distribution::with([
                 'employee.user',
-                'details.baseDrink',
+                'productDetails.baseDrink',
+                'operationalDetails.operationalItem',
             ])
                 ->latest('distribution_date')
                 ->latest()
@@ -196,16 +196,6 @@ class DashboardController extends Controller
                 ->take(5)
                 ->get();
 
-
-            $recentRemainingProducts = RemainingProduct::with([
-                'details.baseDrink',
-            ])
-                ->latest('recorded_at')
-                ->latest()
-                ->take(5)
-                ->get();
-
-
             $recentIncomingGoods = IncomingGood::with(
                 'rawMaterial'
             )
@@ -214,14 +204,13 @@ class DashboardController extends Controller
                 ->take(5)
                 ->get();
 
-            return view('dashboard.admin', compact(
+            return view('dashboard.staff', compact(
                 'activeProducts',
                 'activeRawMaterials',
                 'lowStockMaterials',
                 'activeEmployees',
                 'recentDistributions',
                 'recentSales',
-                'recentRemainingProducts',
                 'recentIncomingGoods'
             ));
         }
@@ -238,7 +227,8 @@ class DashboardController extends Controller
             $today = now()->toDateString();
 
             $todayDistribution = Distribution::with([
-                'details.baseDrink',
+                'productDetails.baseDrink',
+                'operationalDetails.operationalItem',
             ])
                 ->where('employee_id', $employee->id)
                 ->whereDate('distribution_date', $today)
@@ -260,7 +250,8 @@ class DashboardController extends Controller
 
 
             $recentDistributions = Distribution::with([
-                'details.baseDrink',
+                'productDetails.baseDrink',
+                'operationalDetails.operationalItem',
             ])
                 ->where('employee_id', $employee->id)
                 ->latest('distribution_date')

@@ -2,23 +2,24 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-
 use App\Models\Role;
 use App\Models\User;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $owner = Role::where('nama_role', 'Owner')->first();
-        $admin = Role::where('nama_role', 'Admin')->first();
-        $karyawan = Role::where('nama_role', 'Karyawan')->first();
+        $staffOperasional = Role::where(
+            'nama_role',
+            'Staff Operasional'
+        )->first();
+        $karyawan = Role::where(
+            'nama_role',
+            'Karyawan'
+        )->first();
 
         User::create([
             'name' => 'Owner KopiKeun',
@@ -28,10 +29,10 @@ class UserSeeder extends Seeder
         ]);
 
         User::create([
-            'name' => 'Admin KopiKeun',
-            'email' => 'admin@kopikeun.test',
+            'name' => 'Staff Operasional KopiKeun',
+            'email' => 'staff@kopikeun.test',
             'password' => Hash::make('password123'),
-            'role_id' => $admin->id_role,
+            'role_id' => $staffOperasional->id_role,
         ]);
 
         User::create([

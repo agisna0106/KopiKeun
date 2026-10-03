@@ -15,8 +15,8 @@ class DistributionProductDetail extends Model
     ];
 
     protected $casts = [
-        'quantity_distributed' => 'decimal:2',
-        'quantity_returned' => 'decimal:2',
+        'quantity_distributed' => 'integer',
+        'quantity_returned' => 'integer',
     ];
 
     public function distribution(): BelongsTo

@@ -14,6 +14,11 @@ class DistributionOperationalDetail extends Model
         'quantity_returned',
     ];
 
+    protected $casts = [
+        'quantity_distributed' => 'integer',
+        'quantity_returned' => 'integer',
+    ];
+
     public function distribution(): BelongsTo
     {
         return $this->belongsTo(Distribution::class);

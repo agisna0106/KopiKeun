@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Distribution extends Model
 {
     protected $fillable = [
-        'employee_id',
+        'assignment_id',
         'distribution_date',
         'notes',
     ];
@@ -18,18 +18,25 @@ class Distribution extends Model
         'distribution_date' => 'date',
     ];
 
-    public function employee(): BelongsTo
+    public function assignment(): BelongsTo
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(
+            Assignment::class,
+            'assignment_id'
+        );
     }
 
     public function productDetails(): HasMany
     {
-        return $this->hasMany(DistributionProductDetail::class);
+        return $this->hasMany(
+            DistributionProductDetail::class
+        );
     }
 
     public function operationalDetails(): HasMany
     {
-        return $this->hasMany(DistributionOperationalDetail::class);
+        return $this->hasMany(
+            DistributionOperationalDetail::class
+        );
     }
 }

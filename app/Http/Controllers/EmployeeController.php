@@ -3,16 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
+use Illuminate\Validation\Rules\Password;
 
 class EmployeeController extends Controller
 {
     public function index(): View
     {
-        $employees = Employee::with('user')
+        $employees = Employee::with([
+            'user.role',
+        ])
             ->latest()
             ->get();
 
@@ -21,25 +26,53 @@ class EmployeeController extends Controller
 
     public function create(): View
     {
-        $users = User::whereHas('role', function ($query) {
-            $query->whereIn('nama_role', ['Admin', 'Karyawan']);
-        })
-        ->whereDoesntHave('employee')
-        ->orderBy('name')
-        ->get();
+        $users = User::whereDoesntHave('employee')
+            ->orderBy('name')
+            ->get();
 
-        return view('employees.create', compact('users'));
+        $roles = Role::whereIn('nama_role', [
+            'Karyawan',
+            'Staff Operasional',
+        ])
+            ->orderBy('nama_role')
+            ->get();
+
+        return view('employees.create', compact(
+            'users',
+            'roles'
+        ));
     }
 
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'user_id' => [
+            // Account information
+            'name' => [
                 'required',
-                'exists:users,id',
-                'unique:employees,user_id',
+                'string',
+                'max:255',
             ],
 
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                'unique:users,email',
+            ],
+
+            'password' => [
+                'required',
+                'confirmed',
+                Password::defaults(),
+            ],
+
+            'role_id' => [
+                'required',
+                'exists:roles,id_role',
+            ],
+
+            // Employee information
             'employee_code' => [
                 'required',
                 'string',
@@ -64,7 +97,29 @@ class EmployeeController extends Controller
             ],
         ]);
 
-        Employee::create($validated);
+        $role = Role::whereIn('nama_role', [
+            'Karyawan',
+            'Staff Operasional',
+        ])
+            ->where('id_role', $validated['role_id'])
+            ->firstOrFail();
+
+        DB::transaction(function () use ($validated, $role) {
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => $validated['password'],
+                'role_id' => $role->id_role,
+            ]);
+
+            Employee::create([
+                'user_id' => $user->id,
+                'employee_code' => $validated['employee_code'],
+                'phone' => $validated['phone'] ?? null,
+                'address' => $validated['address'] ?? null,
+                'status' => $validated['status'],
+            ]);
+        });
 
         return redirect()
             ->route('employees.index')
@@ -76,10 +131,13 @@ class EmployeeController extends Controller
         //
     }
 
-    public function edit(Employee $employee): View
+   public function edit(Employee $employee): View
     {
         $users = User::whereHas('role', function ($query) {
-            $query->where('nama_role', ['Admin', 'Karyawan']);
+            $query->whereIn('nama_role', [
+                'Karyawan',
+                'Staff Operasional',
+            ]);
         })
         ->where(function ($query) use ($employee) {
             $query->whereDoesntHave('employee')
@@ -129,7 +187,13 @@ class EmployeeController extends Controller
             ],
         ]);
 
-        $employee->update($validated);
+        $employee->update([
+            'user_id' => $validated['user_id'],
+            'employee_code' => $validated['employee_code'],
+            'phone' => $validated['phone'] ?? null,
+            'address' => $validated['address'] ?? null,
+            'status' => $validated['status'],
+        ]);
 
         return redirect()
             ->route('employees.index')
@@ -138,7 +202,13 @@ class EmployeeController extends Controller
 
     public function destroy(Employee $employee): RedirectResponse
     {
-        $employee->delete();
+        DB::transaction(function () use ($employee) {
+            /*
+             * employees.user_id memiliki cascadeOnDelete(),
+             * sehingga menghapus User akan menghapus Employee.
+             */
+            $employee->user->delete();
+        });
 
         return redirect()
             ->route('employees.index')

@@ -19,8 +19,8 @@ class IncomingGood extends Model
     ];
 
     protected $casts = [
-        'quantity' => 'decimal:2',
-        'unit_cost' => 'decimal:2',
+        'quantity' => 'integer',
+        'unit_cost' => 'integer',
         'received_at' => 'date',
     ];
 

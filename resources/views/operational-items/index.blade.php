@@ -3,20 +3,20 @@
         <div class="flex items-center justify-between">
             <div>
                 <h2 class="text-xl font-bold text-stone-900">
-                    Employees
+                    Operational Items
                 </h2>
 
                 <p class="mt-1 text-sm text-stone-500">
-                    Manage employee and operational staff information.
+                    Manage operational items and their stock.
                 </p>
             </div>
 
             <a
-                href="{{ route('employees.create') }}"
+                href="{{ route('operational-items.create') }}"
                 class="rounded-lg bg-amber-700 px-4 py-2 text-sm
                        font-semibold text-white hover:bg-amber-800"
             >
-                Add Employee
+                Add Operational Item
             </a>
         </div>
     </x-slot>
@@ -36,10 +36,10 @@
                 </div>
             @endif
 
-            {{-- Employee List --}}
+            {{-- Operational Item List --}}
             <div class="space-y-4">
 
-                @forelse ($employees as $employee)
+                @forelse ($operationalItems as $item)
 
                     <x-app-card>
 
@@ -47,80 +47,60 @@
 
                             <div class="min-w-0">
 
-                                {{-- Name --}}
                                 <h3 class="truncate text-base font-bold text-stone-900">
-                                    {{ $employee->user->name }}
+                                    {{ $item->name }}
                                 </h3>
 
-                                {{-- Employee Code --}}
                                 <p class="mt-1 text-sm text-stone-500">
-                                    {{ $employee->employee_code }}
+                                    Unit: {{ $item->unit }}
                                 </p>
 
-                                {{-- Role --}}
-                                @if ($employee->user->role)
-                                    <span
-                                        class="mt-2 inline-flex rounded-full
-                                               bg-amber-100 px-2.5 py-1
-                                               text-xs font-semibold
-                                               text-amber-700"
-                                    >
-                                        {{ $employee->user->role->nama_role }}
-                                    </span>
-                                @endif
+                                <div class="mt-2 flex flex-wrap gap-2">
 
-                                {{-- Phone --}}
-                                @if ($employee->phone)
-                                    <p class="mt-2 text-sm text-stone-500">
-                                        {{ $employee->phone }}
-                                    </p>
-                                @endif
-
-                                {{-- Status --}}
-                                <div class="mt-2">
                                     <span
                                         class="inline-flex rounded-full px-2.5 py-1
                                                text-xs font-semibold
-                                               {{ $employee->status === 'Active'
+                                               bg-stone-100 text-stone-700"
+                                    >
+                                        Stock: {{ $item->stock }}
+                                    </span>
+
+                                    <span
+                                        class="inline-flex rounded-full px-2.5 py-1
+                                               text-xs font-semibold
+                                               {{ $item->stock <= $item->minimum_stock
+                                                    ? 'bg-red-100 text-red-700'
+                                                    : 'bg-green-100 text-green-700'
+                                               }}"
+                                    >
+                                        Minimum: {{ $item->minimum_stock }}
+                                    </span>
+
+                                    <span
+                                        class="inline-flex rounded-full px-2.5 py-1
+                                               text-xs font-semibold
+                                               {{ $item->status === 'active'
                                                     ? 'bg-green-100 text-green-700'
                                                     : 'bg-stone-100 text-stone-600'
                                                }}"
                                     >
-                                        {{ $employee->status }}
+                                        {{ ucfirst($item->status) }}
                                     </span>
+
                                 </div>
 
                             </div>
 
-                            {{-- Actions --}}
                             <div class="flex shrink-0 items-center gap-2">
 
                                 <a
-                                    href="{{ route('employees.edit', $employee) }}"
+                                    href="{{ route('operational-items.edit', $item) }}"
                                     class="rounded-lg bg-stone-100 px-3 py-2
                                            text-xs font-semibold text-stone-700
                                            hover:bg-stone-200"
                                 >
                                     Edit
                                 </a>
-
-                                <form
-                                    action="{{ route('employees.destroy', $employee) }}"
-                                    method="POST"
-                                >
-                                    @csrf
-                                    @method('DELETE')
-
-                                    <button
-                                        type="submit"
-                                        onclick="return confirm('Are you sure you want to delete this employee?')"
-                                        class="rounded-lg bg-red-50 px-3 py-2
-                                               text-xs font-semibold text-red-600
-                                               hover:bg-red-100"
-                                    >
-                                        Delete
-                                    </button>
-                                </form>
 
                             </div>
 
@@ -135,11 +115,11 @@
                         <div class="py-8 text-center">
 
                             <p class="text-sm font-medium text-stone-700">
-                                No employees found.
+                                No operational items found.
                             </p>
 
                             <p class="mt-1 text-sm text-stone-500">
-                                Add an employee or operational staff to get started.
+                                Add an operational item to get started.
                             </p>
 
                         </div>

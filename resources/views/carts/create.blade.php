@@ -2,11 +2,11 @@
     <x-slot name="header">
         <div>
             <h2 class="text-xl font-bold text-stone-900">
-                Edit Employee
+                Add Cart
             </h2>
 
             <p class="mt-1 text-sm text-stone-500">
-                Update employee or operational staff information.
+                Add a new cart to the system.
             </p>
         </div>
     </x-slot>
@@ -18,129 +18,87 @@
 
                 <form
                     method="POST"
-                    action="{{ route('employees.update', $employee) }}"
+                    action="{{ route('carts.store') }}"
                     class="space-y-5"
                 >
                     @csrf
-                    @method('PUT')
 
-                    {{-- User Account --}}
+                    {{-- Cart Code --}}
                     <div>
                         <label
-                            for="user_id"
+                            for="code"
                             class="block text-sm font-medium text-stone-700"
                         >
-                            User Account
-                        </label>
-
-                        <select
-                            name="user_id"
-                            id="user_id"
-                            required
-                            class="mt-1 block w-full rounded-lg border-stone-300
-                                   shadow-sm focus:border-amber-600
-                                   focus:ring-amber-600"
-                        >
-                            <option value="">
-                                Select User Account
-                            </option>
-
-                            @foreach ($users as $user)
-                                <option
-                                    value="{{ $user->id }}"
-                                    {{ old('user_id', $employee->user_id) == $user->id ? 'selected' : '' }}
-                                >
-                                    {{ $user->name }} — {{ $user->email }}
-                                </option>
-                            @endforeach
-                        </select>
-
-                        <p class="mt-1 text-xs text-stone-500">
-                            Select an account assigned to Karyawan or Staff Operasional role.
-                        </p>
-
-                        @error('user_id')
-                            <p class="mt-1 text-sm text-red-600">
-                                {{ $message }}
-                            </p>
-                        @enderror
-                    </div>
-
-                    {{-- Employee Code --}}
-                    <div>
-                        <label
-                            for="employee_code"
-                            class="block text-sm font-medium text-stone-700"
-                        >
-                            Employee Code
+                            Cart Code
                         </label>
 
                         <input
                             type="text"
-                            name="employee_code"
-                            id="employee_code"
-                            value="{{ old('employee_code', $employee->employee_code) }}"
-                            placeholder="e.g. EMP001"
+                            name="code"
+                            id="code"
+                            value="{{ old('code') }}"
+                            placeholder="e.g. CART001"
                             required
                             class="mt-1 block w-full rounded-lg border-stone-300
                                    shadow-sm focus:border-amber-600
                                    focus:ring-amber-600"
                         >
 
-                        @error('employee_code')
+                        @error('code')
                             <p class="mt-1 text-sm text-red-600">
                                 {{ $message }}
                             </p>
                         @enderror
                     </div>
 
-                    {{-- Phone --}}
+                    {{-- Cart Name --}}
                     <div>
                         <label
-                            for="phone"
+                            for="name"
                             class="block text-sm font-medium text-stone-700"
                         >
-                            Phone
+                            Cart Name
                         </label>
 
                         <input
                             type="text"
-                            name="phone"
-                            id="phone"
-                            value="{{ old('phone', $employee->phone) }}"
-                            placeholder="e.g. 081234567890"
+                            name="name"
+                            id="name"
+                            value="{{ old('name') }}"
+                            placeholder="e.g. Gerobak Kopi 01"
+                            required
                             class="mt-1 block w-full rounded-lg border-stone-300
                                    shadow-sm focus:border-amber-600
                                    focus:ring-amber-600"
                         >
 
-                        @error('phone')
+                        @error('name')
                             <p class="mt-1 text-sm text-red-600">
                                 {{ $message }}
                             </p>
                         @enderror
                     </div>
 
-                    {{-- Address --}}
+                    {{-- Description --}}
                     <div>
                         <label
-                            for="address"
+                            for="description"
                             class="block text-sm font-medium text-stone-700"
                         >
-                            Address
+                            Description
                         </label>
 
                         <textarea
-                            name="address"
-                            id="address"
+                            name="description"
+                            id="description"
                             rows="3"
-                            placeholder="Enter employee address"
+                            placeholder="Optional cart description"
                             class="mt-1 block w-full rounded-lg border-stone-300
                                    shadow-sm focus:border-amber-600
                                    focus:ring-amber-600"
-                        >{{ old('address', $employee->address) }}</textarea>
+                        >{{ old('description') }}</textarea>
 
-                        @error('address')
+                        @error('description')
                             <p class="mt-1 text-sm text-red-600">
                                 {{ $message }}
                             </p>
@@ -165,15 +123,15 @@
                                    focus:ring-amber-600"
                         >
                             <option
-                                value="Active"
-                                {{ old('status', $employee->status) === 'Active' ? 'selected' : '' }}
+                                value="active"
+                                {{ old('status', 'active') === 'active' ? 'selected' : '' }}
                             >
                                 Active
                             </option>
 
                             <option
-                                value="Inactive"
-                                {{ old('status', $employee->status) === 'Inactive' ? 'selected' : '' }}
+                                value="inactive"
+                                {{ old('status') === 'inactive' ? 'selected' : '' }}
                             >
                                 Inactive
                             </option>
@@ -196,11 +154,11 @@
                                    font-semibold text-white
                                    hover:bg-amber-800"
                         >
-                            Update Employee
+                            Save Cart
                         </button>
 
                         <a
-                            href="{{ route('employees.index') }}"
+                            href="{{ route('carts.index') }}"
                             class="inline-flex justify-center rounded-lg
                                    bg-stone-200 px-4 py-2 text-sm
                                    font-semibold text-stone-700

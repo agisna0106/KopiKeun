@@ -16,7 +16,7 @@ class OperationalExpense extends Model
     ];
 
     protected $casts = [
-        'amount' => 'decimal:2',
+        'amount' => 'integer',
         'expense_date' => 'date',
     ];
 }

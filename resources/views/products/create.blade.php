@@ -102,7 +102,7 @@
                         id="price"
                         value="{{ old('price') }}"
                         min="0"
-                        step="0.01"
+                        step="1"
                         required
                         class="mt-1 block w-full rounded-lg border-stone-300 shadow-sm
                             focus:border-amber-600 focus:ring-amber-600"

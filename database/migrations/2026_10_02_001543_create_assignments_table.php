@@ -26,9 +26,12 @@ return new class extends Migration
                 ->constrained('regions')
                 ->restrictOnDelete();
 
-            $table->date('assignment_date');
-            $table->string('status')->default('active');
-            $table->string('notes')->nullable();
+            $table->date('start_date');
+            $table->date('end_date')->nullable();
+
+            $table->string('status')->default('Active');
+
+            $table->text('notes')->nullable();
 
             $table->timestamps();
         });

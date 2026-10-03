@@ -17,8 +17,8 @@ class BaseDrink extends Model
     ];
 
     protected $casts = [
-        'bottle_capacity_ml' => 'decimal:2',
-        'standard_serving_ml' => 'decimal:2',
+        'bottle_capacity_ml' => 'integer',
+        'standard_serving_ml' => 'integer',
     ];
 
     public function products(): HasMany

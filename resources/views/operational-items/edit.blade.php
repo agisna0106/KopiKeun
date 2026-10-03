@@ -2,11 +2,11 @@
     <x-slot name="header">
         <div>
             <h2 class="text-xl font-bold text-stone-900">
-                Edit Employee
+                Edit Operational Item
             </h2>
 
             <p class="mt-1 text-sm text-stone-500">
-                Update employee or operational staff information.
+                Update operational item information.
             </p>
         </div>
     </x-slot>
@@ -18,129 +18,116 @@
 
                 <form
                     method="POST"
-                    action="{{ route('employees.update', $employee) }}"
+                    action="{{ route('operational-items.update', $operationalItem) }}"
                     class="space-y-5"
                 >
                     @csrf
                     @method('PUT')
 
-                    {{-- User Account --}}
+                    {{-- Name --}}
                     <div>
                         <label
-                            for="user_id"
+                            for="name"
                             class="block text-sm font-medium text-stone-700"
                         >
-                            User Account
-                        </label>
-
-                        <select
-                            name="user_id"
-                            id="user_id"
-                            required
-                            class="mt-1 block w-full rounded-lg border-stone-300
-                                   shadow-sm focus:border-amber-600
-                                   focus:ring-amber-600"
-                        >
-                            <option value="">
-                                Select User Account
-                            </option>
-
-                            @foreach ($users as $user)
-                                <option
-                                    value="{{ $user->id }}"
-                                    {{ old('user_id', $employee->user_id) == $user->id ? 'selected' : '' }}
-                                >
-                                    {{ $user->name }} — {{ $user->email }}
-                                </option>
-                            @endforeach
-                        </select>
-
-                        <p class="mt-1 text-xs text-stone-500">
-                            Select an account assigned to Karyawan or Staff Operasional role.
-                        </p>
-
-                        @error('user_id')
-                            <p class="mt-1 text-sm text-red-600">
-                                {{ $message }}
-                            </p>
-                        @enderror
-                    </div>
-
-                    {{-- Employee Code --}}
-                    <div>
-                        <label
-                            for="employee_code"
-                            class="block text-sm font-medium text-stone-700"
-                        >
-                            Employee Code
+                            Item Name
                         </label>
 
                         <input
                             type="text"
-                            name="employee_code"
-                            id="employee_code"
-                            value="{{ old('employee_code', $employee->employee_code) }}"
-                            placeholder="e.g. EMP001"
+                            name="name"
+                            id="name"
+                            value="{{ old('name', $operationalItem->name) }}"
                             required
                             class="mt-1 block w-full rounded-lg border-stone-300
                                    shadow-sm focus:border-amber-600
                                    focus:ring-amber-600"
                         >
 
-                        @error('employee_code')
+                        @error('name')
                             <p class="mt-1 text-sm text-red-600">
                                 {{ $message }}
                             </p>
                         @enderror
                     </div>
 
-                    {{-- Phone --}}
+                    {{-- Unit --}}
                     <div>
                         <label
-                            for="phone"
+                            for="unit"
                             class="block text-sm font-medium text-stone-700"
                         >
-                            Phone
+                            Unit
                         </label>
 
                         <input
                             type="text"
-                            name="phone"
-                            id="phone"
-                            value="{{ old('phone', $employee->phone) }}"
-                            placeholder="e.g. 081234567890"
+                            name="unit"
+                            id="unit"
+                            value="{{ old('unit', $operationalItem->unit) }}"
+                            required
                             class="mt-1 block w-full rounded-lg border-stone-300
                                    shadow-sm focus:border-amber-600
                                    focus:ring-amber-600"
                         >
 
-                        @error('phone')
+                        @error('unit')
                             <p class="mt-1 text-sm text-red-600">
                                 {{ $message }}
                             </p>
                         @enderror
                     </div>
 
-                    {{-- Address --}}
+                    {{-- Stock --}}
                     <div>
                         <label
-                            for="address"
+                            for="stock"
                             class="block text-sm font-medium text-stone-700"
                         >
-                            Address
+                            Current Stock
                         </label>
 
-                        <textarea
-                            name="address"
-                            id="address"
-                            rows="3"
-                            placeholder="Enter employee address"
+                        <input
+                            type="number"
+                            name="stock"
+                            id="stock"
+                            value="{{ old('stock', $operationalItem->stock) }}"
+                            min="0"
+                            required
                             class="mt-1 block w-full rounded-lg border-stone-300
                                    shadow-sm focus:border-amber-600
                                    focus:ring-amber-600"
-                        >{{ old('address', $employee->address) }}</textarea>
+                        >
 
-                        @error('address')
+                        @error('stock')
+                            <p class="mt-1 text-sm text-red-600">
+                                {{ $message }}
+                            </p>
+                        @enderror
+                    </div>
+
+                    {{-- Minimum Stock --}}
+                    <div>
+                        <label
+                            for="minimum_stock"
+                            class="block text-sm font-medium text-stone-700"
+                        >
+                            Minimum Stock
+                        </label>
+
+                        <input
+                            type="number"
+                            name="minimum_stock"
+                            id="minimum_stock"
+                            value="{{ old('minimum_stock', $operationalItem->minimum_stock) }}"
+                            min="0"
+                            required
+                            class="mt-1 block w-full rounded-lg border-stone-300
+                                   shadow-sm focus:border-amber-600
+                                   focus:ring-amber-600"
+                        >
+
+                        @error('minimum_stock')
                             <p class="mt-1 text-sm text-red-600">
                                 {{ $message }}
                             </p>
@@ -165,15 +152,15 @@
                                    focus:ring-amber-600"
                         >
                             <option
-                                value="Active"
-                                {{ old('status', $employee->status) === 'Active' ? 'selected' : '' }}
+                                value="active"
+                                {{ old('status', $operationalItem->status) === 'active' ? 'selected' : '' }}
                             >
                                 Active
                             </option>
 
                             <option
-                                value="Inactive"
-                                {{ old('status', $employee->status) === 'Inactive' ? 'selected' : '' }}
+                                value="inactive"
+                                {{ old('status', $operationalItem->status) === 'inactive' ? 'selected' : '' }}
                             >
                                 Inactive
                             </option>
@@ -196,11 +183,11 @@
                                    font-semibold text-white
                                    hover:bg-amber-800"
                         >
-                            Update Employee
+                            Update Operational Item
                         </button>
 
                         <a
-                            href="{{ route('employees.index') }}"
+                            href="{{ route('operational-items.index') }}"
                             class="inline-flex justify-center rounded-lg
                                    bg-stone-200 px-4 py-2 text-sm
                                    font-semibold text-stone-700

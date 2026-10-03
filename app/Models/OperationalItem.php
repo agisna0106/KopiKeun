@@ -17,6 +17,9 @@ class OperationalItem extends Model
 
     public function distributionDetails(): HasMany
     {
-        return $this->hasMany(DistributionOperationalDetail::class);
+        return $this->hasMany(
+            DistributionOperationalDetail::class,
+            'operational_item_id'
+        );
     }
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Assignment extends Model
 {
@@ -11,13 +12,15 @@ class Assignment extends Model
         'employee_id',
         'cart_id',
         'region_id',
-        'assignment_date',
+        'start_date',
+        'end_date',
         'status',
         'notes',
     ];
 
     protected $casts = [
-        'assignment_date' => 'date',
+        'start_date' => 'date',
+        'end_date' => 'date',
     ];
 
     public function employee(): BelongsTo
@@ -33,5 +36,10 @@ class Assignment extends Model
     public function region(): BelongsTo
     {
         return $this->belongsTo(Region::class);
+    }
+
+    public function distributions(): HasMany
+    {
+        return $this->hasMany(Distribution::class);
     }
 }

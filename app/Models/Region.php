@@ -15,6 +15,9 @@ class Region extends Model
 
     public function assignments(): HasMany
     {
-        return $this->hasMany(Assignment::class);
+        return $this->hasMany(
+            Assignment::class,
+            'region_id'
+        );
     }
 }

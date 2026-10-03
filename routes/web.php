@@ -13,6 +13,10 @@ use App\Http\Controllers\DistributionController;
 use App\Http\Controllers\RemainingProductController;
 use App\Http\Controllers\FinancialReportController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\RegionController;
+use App\Http\Controllers\OperationalItemController;
+use App\Http\Controllers\AssignmentController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -38,7 +42,7 @@ Route::middleware('auth')->group(function () {
     })->name('logout.now');
 });
 
-Route::middleware(['auth', 'role:Owner,Admin'])
+Route::middleware(['auth', 'role:Owner,Staff Operasional'])
     ->group(function () {
         Route::resource('products', ProductController::class)
             ->except(['show']);
@@ -61,6 +65,20 @@ Route::middleware(['auth', 'role:Owner,Admin'])
 
         Route::resource('remaining-products',RemainingProductController::class);
 
+        Route::resource('carts', CartController::class)
+            ->except(['show', 'destroy']);
+
+        Route::resource('regions', RegionController::class)
+            ->except(['show', 'destroy']);
+
+        Route::resource(
+            'operational-items',
+            OperationalItemController::class
+        )->except(['show', 'destroy']);
+
+        Route::resource('assignments', AssignmentController::class)
+            ->except(['show']);
+
     });
 
 Route::middleware(['auth', 'role:Owner'])
@@ -80,9 +98,9 @@ Route::get('/owner-test', function () {
     return 'Halaman khusus Owner';
 })->middleware(['auth', 'role:Owner']);
 
-Route::get('/admin-test', function () {
-    return 'Halaman khusus Admin';
-})->middleware(['auth', 'role:Admin']);
+Route::get('/staff-operasional-test', function () {
+    return 'Halaman khusus Staff Operasional';
+})->middleware(['auth', 'role:Staff Operasional']);
 
 Route::get('/karyawan-test', function () {
     return 'Halaman khusus Karyawan';

@@ -1,180 +1,369 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex w-full items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Distribution Details
-            </h2>
+        <div class="flex items-center justify-between gap-4">
+            <div>
+                <h2 class="text-xl font-bold text-stone-900">
+                    Distribution Details
+                </h2>
 
-            <div class="flex gap-2">
-                <a
-                    href="{{ route('distributions.edit', $distribution) }}"
-                    class="inline-flex items-center rounded-md px-4 py-2 text-sm font-semibold text-white"
-                    style="background-color: #2563eb;"
-                >
-                    Edit
-                </a>
-
-                <a
-                    href="{{ route('distributions.index') }}"
-                    class="inline-flex items-center rounded-md bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-300"
-                >
-                    Back
-                </a>
+                <p class="mt-1 text-sm text-stone-500">
+                    View distribution information and distributed items.
+                </p>
             </div>
+
+            <a
+                href="{{ route('distributions.index') }}"
+                class="rounded-lg bg-stone-100 px-4 py-2
+                       text-sm font-semibold text-stone-700
+                       hover:bg-stone-200"
+            >
+                Back
+            </a>
         </div>
     </x-slot>
 
     <div class="py-6">
-        <div class="mx-auto w-full max-w-5xl px-4 sm:px-6 lg:px-8">
+        <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
 
+            {{-- Actions --}}
+            <div class="mb-6 flex items-center justify-end gap-2">
+
+                <a
+                    href="{{ route('distributions.edit', $distribution) }}"
+                    class="rounded-lg bg-amber-700 px-4 py-2
+                           text-sm font-semibold text-white
+                           hover:bg-amber-800"
+                >
+                    Edit
+                </a>
+
+                <form
+                    action="{{ route('distributions.destroy', $distribution) }}"
+                    method="POST"
+                >
+                    @csrf
+                    @method('DELETE')
+
+                    <button
+                        type="submit"
+                        onclick="return confirm('Are you sure you want to delete this distribution?')"
+                        class="rounded-lg bg-red-50 px-4 py-2
+                               text-sm font-semibold text-red-600
+                               hover:bg-red-100"
+                    >
+                        Delete
+                    </button>
+                </form>
+
+            </div>
+
+
+            {{-- ========================================================= --}}
             {{-- Distribution Information --}}
-            <div class="mb-6 rounded-lg bg-white p-6 shadow-sm">
+            {{-- ========================================================= --}}
 
-                <h3 class="mb-4 text-lg font-semibold text-gray-800">
-                    Distribution Information
-                </h3>
+            <x-app-card>
 
-                <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                <div class="mb-5">
+                    <h3 class="text-base font-bold text-stone-900">
+                        Distribution Information
+                    </h3>
+                </div>
 
+                <div class="grid gap-5 sm:grid-cols-2">
+
+                    {{-- Employee --}}
                     <div>
-                        <p class="text-sm text-gray-500">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-stone-500">
                             Employee
                         </p>
 
-                        <p class="mt-1 font-medium text-gray-900">
+                        <p class="mt-1 text-sm font-semibold text-stone-900">
                             {{ $distribution->employee->user->name }}
                         </p>
 
-                        <p class="text-sm text-gray-500">
+                        <p class="mt-1 text-sm text-stone-500">
                             {{ $distribution->employee->employee_code }}
                         </p>
                     </div>
 
+                    {{-- Date --}}
                     <div>
-                        <p class="text-sm text-gray-500">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-stone-500">
                             Distribution Date
                         </p>
 
-                        <p class="mt-1 font-medium text-gray-900">
-                            {{ $distribution->distribution_date->format('d/m/Y') }}
+                        <p class="mt-1 text-sm font-semibold text-stone-900">
+                            {{ $distribution->distribution_date->format('d M Y') }}
                         </p>
                     </div>
 
-                    <div class="md:col-span-2">
-                        <p class="text-sm text-gray-500">
+                </div>
+
+                @php
+                    $assignment = $distribution->employee
+                        ->assignments
+                        ->where('status', 'active')
+                        ->first();
+                @endphp
+
+                @if ($assignment)
+
+                    <div class="mt-5 border-t border-stone-200 pt-5">
+
+                        <p class="text-xs font-semibold uppercase tracking-wide text-stone-500">
+                            Current Assignment
+                        </p>
+
+                        <div class="mt-3 grid gap-4 sm:grid-cols-2">
+
+                            <div>
+                                <p class="text-xs text-stone-500">
+                                    Cart
+                                </p>
+
+                                <p class="mt-1 text-sm font-semibold text-stone-900">
+                                    {{ $assignment->cart->name ?? '-' }}
+                                </p>
+                            </div>
+
+                            <div>
+                                <p class="text-xs text-stone-500">
+                                    Region
+                                </p>
+
+                                <p class="mt-1 text-sm font-semibold text-stone-900">
+                                    {{ $assignment->region->name ?? '-' }}
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                @endif
+
+                @if ($distribution->notes)
+
+                    <div class="mt-5 border-t border-stone-200 pt-5">
+
+                        <p class="text-xs font-semibold uppercase tracking-wide text-stone-500">
                             Notes
                         </p>
 
-                        <p class="mt-1 font-medium text-gray-900">
-                            {{ $distribution->notes ?: '-' }}
+                        <p class="mt-2 whitespace-pre-line text-sm text-stone-700">
+                            {{ $distribution->notes }}
+                        </p>
+
+                    </div>
+
+                @endif
+
+            </x-app-card>
+
+
+            {{-- ========================================================= --}}
+            {{-- Base Drinks --}}
+            {{-- ========================================================= --}}
+
+            <x-app-card class="mt-6">
+
+                <div class="mb-5">
+                    <h3 class="text-base font-bold text-stone-900">
+                        Base Drinks
+                    </h3>
+
+                    <p class="mt-1 text-sm text-stone-500">
+                        Base drink distribution records.
+                    </p>
+                </div>
+
+                @if ($distribution->productDetails->isNotEmpty())
+
+                    <div class="overflow-hidden rounded-lg border border-stone-200">
+
+                        <div
+                            class="grid grid-cols-3
+                                   bg-stone-50 px-4 py-3
+                                   text-xs font-semibold text-stone-600"
+                        >
+                            <span>Base Drink</span>
+
+                            <span class="text-center">
+                                Distributed
+                            </span>
+
+                            <span class="text-right">
+                                Returned
+                            </span>
+                        </div>
+
+                        @foreach ($distribution->productDetails as $detail)
+
+                            <div
+                                class="grid grid-cols-3
+                                       border-t border-stone-200
+                                       px-4 py-3 text-sm"
+                            >
+
+                                <span class="font-medium text-stone-800">
+                                    {{ $detail->baseDrink->name ?? '-' }}
+                                </span>
+
+                                <span class="text-center text-stone-600">
+                                    {{ $detail->quantity_distributed }}
+                                </span>
+
+                                <span class="text-right text-stone-600">
+                                    {{ $detail->quantity_returned }}
+                                </span>
+
+                            </div>
+
+                        @endforeach
+
+                    </div>
+
+                @else
+
+                    <div
+                        class="rounded-lg border border-dashed
+                               border-stone-300 px-4 py-6 text-center"
+                    >
+                        <p class="text-sm text-stone-500">
+                            No base drinks were distributed.
                         </p>
                     </div>
 
-                </div>
-            </div>
+                @endif
 
-            {{-- Distribution Details --}}
-            <div class="overflow-hidden rounded-lg bg-white shadow-sm">
+            </x-app-card>
 
-                <div class="border-b border-gray-200 p-6">
-                    <h3 class="text-lg font-semibold text-gray-800">
-                        Distributed Base Drinks
+
+            {{-- ========================================================= --}}
+            {{-- Operational Items --}}
+            {{-- ========================================================= --}}
+
+            <x-app-card class="mt-6">
+
+                <div class="mb-5">
+                    <h3 class="text-base font-bold text-stone-900">
+                        Operational Items
                     </h3>
+
+                    <p class="mt-1 text-sm text-stone-500">
+                        Operational items deducted from stock.
+                    </p>
                 </div>
 
-                <div class="overflow-x-auto">
+                @if ($distribution->operationalDetails->isNotEmpty())
 
-                    <table class="w-full divide-y divide-gray-200">
+                    <div class="overflow-hidden rounded-lg border border-stone-200">
 
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                    Base Drink
-                                </th>
+                        <div
+                            class="grid grid-cols-4
+                                   bg-stone-50 px-4 py-3
+                                   text-xs font-semibold text-stone-600"
+                        >
+                            <span>Item</span>
 
-                                <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                    Estimated Servings
-                                </th>
+                            <span class="text-center">
+                                Distributed
+                            </span>
 
-                                <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                    Standard Serving
-                                </th>
+                            <span class="text-center">
+                                Returned
+                            </span>
 
-                                <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                    Estimated Volume
-                                </th>
-                            </tr>
-                        </thead>
+                            <span class="text-right">
+                                Used
+                            </span>
+                        </div>
 
-                        <tbody class="divide-y divide-gray-200 bg-white">
+                        @foreach ($distribution->operationalDetails as $detail)
 
-                            @forelse ($distribution->details as $detail)
+                            @php
+                                $used =
+                                    $detail->quantity_distributed
+                                    - $detail->quantity_returned;
+                            @endphp
 
-                                <tr>
+                            <div
+                                class="grid grid-cols-4
+                                       border-t border-stone-200
+                                       px-4 py-3 text-sm"
+                            >
 
-                                    <td class="px-6 py-4 text-sm font-medium text-gray-900">
-                                        {{ $detail->baseDrink->name }}
-                                    </td>
+                                <div>
+                                    <p class="font-medium text-stone-800">
+                                        {{ $detail->operationalItem->name ?? '-' }}
+                                    </p>
 
-                                    <td class="px-6 py-4 text-right text-sm text-gray-700">
-                                        {{ number_format($detail->quantity, 2, ',', '.') }}
-                                    </td>
+                                    @if ($detail->operationalItem)
+                                        <p class="mt-0.5 text-xs text-stone-500">
+                                            Unit:
+                                            {{ $detail->operationalItem->unit }}
+                                        </p>
+                                    @endif
+                                </div>
 
-                                    <td class="px-6 py-4 text-right text-sm text-gray-700">
-                                        {{ number_format($detail->baseDrink->standard_serving_ml, 0, ',', '.') }}
-                                        ml
-                                    </td>
+                                <span class="text-center text-stone-600">
+                                    {{ $detail->quantity_distributed }}
+                                </span>
 
-                                    <td class="px-6 py-4 text-right text-sm text-gray-700">
-                                        {{ number_format(
-                                            $detail->quantity * $detail->baseDrink->standard_serving_ml,
-                                            0,
-                                            ',',
-                                            '.'
-                                        ) }}
-                                        ml
-                                    </td>
+                                <span class="text-center text-stone-600">
+                                    {{ $detail->quantity_returned }}
+                                </span>
 
-                                </tr>
+                                <span class="text-right font-semibold text-stone-800">
+                                    {{ $used }}
+                                </span>
 
-                            @empty
+                            </div>
 
-                                <tr>
-                                    <td
-                                        colspan="4"
-                                        class="px-6 py-12 text-center text-sm text-gray-500"
-                                    >
-                                        No distribution details found.
-                                    </td>
-                                </tr>
+                        @endforeach
 
-                            @endforelse
+                    </div>
 
-                        </tbody>
+                    <div
+                        class="mt-4 rounded-lg bg-amber-50 px-4 py-3
+                               text-sm text-amber-800"
+                    >
+                        <span class="font-semibold">
+                            Used
+                        </span>
+                        represents the net quantity consumed:
 
-                        <tfoot class="bg-gray-50">
-                            <tr>
-                                <td
-                                    class="px-6 py-4 text-right text-sm font-semibold text-gray-800"
-                                >
-                                    Total
-                                </td>
+                        <span class="font-semibold">
+                            Distributed − Returned
+                        </span>.
+                    </div>
 
-                                <td
-                                    class="px-6 py-4 text-right text-sm font-bold text-gray-900"
-                                >
-                                    {{ number_format($distribution->details->sum('quantity'), 2, ',', '.') }}
-                                    servings
-                                </td>
+                @else
 
-                                <td colspan="2"></td>
-                            </tr>
-                        </tfoot>
+                    <div
+                        class="rounded-lg border border-dashed
+                               border-stone-300 px-4 py-6 text-center"
+                    >
+                        <p class="text-sm text-stone-500">
+                            No operational items were distributed.
+                        </p>
+                    </div>
 
-                    </table>
+                @endif
 
-                </div>
+            </x-app-card>
 
+
+            {{-- Back --}}
+            <div class="mt-6">
+                <a
+                    href="{{ route('distributions.index') }}"
+                    class="text-sm font-semibold text-stone-600
+                           hover:text-stone-900"
+                >
+                    ← Back to distributions
+                </a>
             </div>
 
         </div>

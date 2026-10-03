@@ -10,7 +10,7 @@ class Employee extends Model
 {
     protected $fillable = [
         'user_id',
-        'name',
+        'employee_code',
         'phone',
         'address',
         'status',
@@ -29,5 +29,13 @@ class Employee extends Model
     public function distributions(): HasMany
     {
         return $this->hasMany(Distribution::class);
+    }
+
+    public function distributionDetails(): HasMany
+    {
+        return $this->hasMany(
+            DistributionOperationalDetail::class,
+            'operational_item_id'
+        );
     }
 }
