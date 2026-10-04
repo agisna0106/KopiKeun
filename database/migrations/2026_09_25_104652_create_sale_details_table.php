@@ -9,28 +9,25 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-        Schema::create('sale_details', function (Blueprint $table) {
-            $table->id();
+        public function up(): void
+        {
+            Schema::create('sales', function (Blueprint $table) {
+                $table->id();
 
-            $table->foreignId('sale_id')
-                ->constrained('sales')
-                ->cascadeOnDelete();
+                $table->string('sale_source');
 
-            $table->foreignId('product_id')
-                ->constrained('products')
-                ->restrictOnDelete();
+                $table->foreignId('distribution_id')
+                    ->nullable()
+                    ->constrained('distributions')
+                    ->nullOnDelete();
 
-            $table->decimal('quantity', 12, 2);
+                $table->date('sale_date');
 
-            $table->decimal('unit_price', 12, 2);
+                $table->text('notes')->nullable();
 
-            $table->decimal('subtotal', 12, 2);
-
-            $table->timestamps();
-        });
-    }
+                $table->timestamps();
+            });
+        }
 
 
     /**

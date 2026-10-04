@@ -79,11 +79,11 @@
                         </p>
 
                         <p class="mt-1 text-sm font-semibold text-stone-900">
-                            {{ $distribution->employee->user->name }}
+                            {{ $distribution->assignment->employee->user->name }}
                         </p>
 
                         <p class="mt-1 text-sm text-stone-500">
-                            {{ $distribution->employee->employee_code }}
+                            {{ $distribution->assignment->employee->employee_code }}
                         </p>
                     </div>
 
@@ -101,7 +101,7 @@
                 </div>
 
                 @php
-                    $assignment = $distribution->employee
+                    $assignment = $distribution->assignment->employee
                         ->assignments
                         ->where('status', 'active')
                         ->first();

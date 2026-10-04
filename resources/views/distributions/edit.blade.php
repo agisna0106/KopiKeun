@@ -60,48 +60,56 @@
 
                     <div class="grid gap-5 sm:grid-cols-2">
 
-                        {{-- Employee --}}
+                        {{-- Assignment --}}
                         <div>
                             <label
-                                for="employee_id"
+                                for="assignment_id"
                                 class="mb-1.5 block text-sm font-semibold text-stone-700"
                             >
-                                Employee
+                                Assignment
                             </label>
 
                             <select
-                                id="employee_id"
-                                name="employee_id"
+                                id="assignment_id"
+                                name="assignment_id"
                                 required
                                 class="w-full rounded-lg border-stone-300
-                                       text-sm shadow-sm
-                                       focus:border-amber-500
-                                       focus:ring-amber-500"
+                                    text-sm shadow-sm
+                                    focus:border-amber-500
+                                    focus:ring-amber-500"
                             >
                                 <option value="">
-                                    Select employee
+                                    Select assignment
                                 </option>
 
-                                @foreach ($employees as $employee)
+                                @foreach ($assignments as $assignment)
                                     <option
-                                        value="{{ $employee->id }}"
+                                        value="{{ $assignment->id }}"
                                         {{ old(
-                                            'employee_id',
-                                            $distribution->employee_id
-                                        ) == $employee->id ? 'selected' : '' }}
+                                            'assignment_id',
+                                            $distribution->assignment_id
+                                        ) == $assignment->id ? 'selected' : '' }}
                                     >
-                                        {{ $employee->employee_code }}
+                                        {{ $assignment->employee->employee_code }}
                                         -
-                                        {{ $employee->user->name }}
+                                        {{ $assignment->employee->user->name }}
+                                        |
+                                        {{ $assignment->cart->name ?? '-' }}
+                                        -
+                                        {{ $assignment->region->name ?? '-' }}
                                     </option>
                                 @endforeach
                             </select>
 
-                            @error('employee_id')
+                            @error('assignment_id')
                                 <p class="mt-1 text-xs text-red-600">
                                     {{ $message }}
                                 </p>
                             @enderror
+
+                            <p class="mt-1 text-xs text-stone-500">
+                                Select the assignment carried out by the employee.
+                            </p>
                         </div>
 
 
@@ -230,15 +238,6 @@
                                         >
                                             Base Drink
                                         </label>
-
-                                        <select
-                                            name="products[{{ $index }}][id]"
-                                            class="hidden"
-                                        >
-                                            <option value="{{ $detail->id }}">
-                                                {{ $detail->id }}
-                                            </option>
-                                        </select>
 
                                         <select
                                             name="products[{{ $index }}][base_drink_id]"

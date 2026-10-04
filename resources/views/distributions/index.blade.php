@@ -52,6 +52,11 @@
 
                 @forelse ($distributions as $distribution)
 
+                    @php
+                        $assignment = $distribution->assignment;
+                        $employee = $assignment?->employee;
+                    @endphp
+
                     <x-app-card>
 
                         <div class="flex flex-col gap-4">
@@ -65,18 +70,21 @@
 
                                 <div class="min-w-0">
 
+                                    {{-- Employee Name --}}
                                     <h3 class="text-base font-bold text-stone-900">
-                                        {{ $distribution->employee->user->name }}
+                                        {{ $employee?->user?->name ?? '-' }}
                                     </h3>
 
+                                    {{-- Employee Code --}}
                                     <p class="mt-1 text-sm text-stone-500">
                                         Employee Code:
-                                        {{ $distribution->employee->employee_code }}
+                                        {{ $employee?->employee_code ?? '-' }}
                                     </p>
 
+                                    {{-- Distribution Date --}}
                                     <p class="mt-1 text-sm text-stone-500">
                                         Date:
-                                        {{ $distribution->distribution_date->format('d M Y') }}
+                                        {{ $distribution->distribution_date?->format('d M Y') ?? '-' }}
                                     </p>
 
                                 </div>
@@ -124,36 +132,81 @@
 
                             </div>
 
-                            {{-- Assignment Information --}}
-                            @php
-                                $assignment = $distribution->employee
-                                    ->assignments
-                                    ->where('status', 'active')
-                                    ->first();
-                            @endphp
 
+                            {{-- Assignment Information --}}
                             @if ($assignment)
+
                                 <div
                                     class="rounded-lg bg-stone-50 px-4 py-3
                                            text-sm text-stone-600"
                                 >
-                                    <div class="flex flex-col gap-1 sm:flex-row sm:gap-6">
+
+                                    <div
+                                        class="flex flex-col gap-1
+                                               sm:flex-row sm:gap-6"
+                                    >
+
+                                        {{-- Assignment --}}
+                                        <span>
+                                            <span class="font-semibold text-stone-700">
+                                                Assignment:
+                                            </span>
+
+                                            #{{ $assignment->id }}
+                                        </span>
+
+                                        {{-- Cart --}}
                                         <span>
                                             <span class="font-semibold text-stone-700">
                                                 Cart:
                                             </span>
-                                            {{ $assignment->cart->name ?? '-' }}
+
+                                            {{ $assignment->cart?->name ?? '-' }}
                                         </span>
 
+                                        {{-- Region --}}
                                         <span>
                                             <span class="font-semibold text-stone-700">
                                                 Region:
                                             </span>
-                                            {{ $assignment->region->name ?? '-' }}
+
+                                            {{ $assignment->region?->name ?? '-' }}
                                         </span>
+
                                     </div>
+
+                                    {{-- Assignment Period --}}
+                                    <div
+                                        class="mt-1 flex flex-col gap-1
+                                               sm:flex-row sm:gap-6"
+                                    >
+
+                                        <span>
+                                            <span class="font-semibold text-stone-700">
+                                                Assignment Period:
+                                            </span>
+
+                                            {{ $assignment->start_date?->format('d M Y') ?? '-' }}
+
+                                            -
+
+                                            {{ $assignment->end_date?->format('d M Y') ?? 'Present' }}
+                                        </span>
+
+                                        <span>
+                                            <span class="font-semibold text-stone-700">
+                                                Status:
+                                            </span>
+
+                                            {{ $assignment->status }}
+                                        </span>
+
+                                    </div>
+
                                 </div>
+
                             @endif
+
 
                             {{-- Base Drinks --}}
                             <div>
@@ -164,7 +217,10 @@
 
                                 @if ($distribution->productDetails->isNotEmpty())
 
-                                    <div class="mt-2 overflow-hidden rounded-lg border border-stone-200">
+                                    <div
+                                        class="mt-2 overflow-hidden rounded-lg
+                                               border border-stone-200"
+                                    >
 
                                         <div
                                             class="grid grid-cols-3
@@ -173,9 +229,11 @@
                                                    text-stone-600"
                                         >
                                             <span>Item</span>
+
                                             <span class="text-center">
                                                 Distributed
                                             </span>
+
                                             <span class="text-right">
                                                 Returned
                                             </span>
@@ -190,7 +248,7 @@
                                             >
 
                                                 <span class="text-stone-700">
-                                                    {{ $detail->baseDrink->name ?? '-' }}
+                                                    {{ $detail->baseDrink?->name ?? '-' }}
                                                 </span>
 
                                                 <span class="text-center text-stone-600">
@@ -217,6 +275,7 @@
 
                             </div>
 
+
                             {{-- Operational Items --}}
                             <div>
 
@@ -226,7 +285,10 @@
 
                                 @if ($distribution->operationalDetails->isNotEmpty())
 
-                                    <div class="mt-2 overflow-hidden rounded-lg border border-stone-200">
+                                    <div
+                                        class="mt-2 overflow-hidden rounded-lg
+                                               border border-stone-200"
+                                    >
 
                                         <div
                                             class="grid grid-cols-3
@@ -235,9 +297,11 @@
                                                    text-stone-600"
                                         >
                                             <span>Item</span>
+
                                             <span class="text-center">
                                                 Distributed
                                             </span>
+
                                             <span class="text-right">
                                                 Returned
                                             </span>
@@ -252,7 +316,7 @@
                                             >
 
                                                 <span class="text-stone-700">
-                                                    {{ $detail->operationalItem->name ?? '-' }}
+                                                    {{ $detail->operationalItem?->name ?? '-' }}
                                                 </span>
 
                                                 <span class="text-center text-stone-600">
@@ -279,10 +343,12 @@
 
                             </div>
 
+
                             {{-- Notes --}}
                             @if ($distribution->notes)
 
                                 <div>
+
                                     <h4 class="text-sm font-semibold text-stone-800">
                                         Notes
                                     </h4>
@@ -290,6 +356,7 @@
                                     <p class="mt-1 text-sm text-stone-600">
                                         {{ $distribution->notes }}
                                     </p>
+
                                 </div>
 
                             @endif
@@ -323,6 +390,8 @@
         </div>
     </div>
 
+
+    {{-- Auto-hide success notification --}}
     <script>
         setTimeout(() => {
             const notification =
@@ -333,4 +402,5 @@
             }
         }, 3000);
     </script>
+
 </x-app-layout>

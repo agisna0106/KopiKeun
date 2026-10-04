@@ -13,16 +13,17 @@ class SaleDetail extends Model
         'sale_id',
         'product_id',
         'quantity',
-        'unit_price',
         'subtotal',
     ];
 
     protected $casts = [
         'quantity' => 'integer',
-        'unit_price' => 'decimal:2',
         'subtotal' => 'decimal:2',
     ];
 
+    /**
+     * Sale detail belongs to a sale.
+     */
     public function sale(): BelongsTo
     {
         return $this->belongsTo(
@@ -31,6 +32,9 @@ class SaleDetail extends Model
         );
     }
 
+    /**
+     * Sale detail belongs to a product.
+     */
     public function product(): BelongsTo
     {
         return $this->belongsTo(
