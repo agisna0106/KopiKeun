@@ -1,4 +1,5 @@
 <x-app-layout>
+
     <x-slot name="header">
         <div>
             <h2 class="text-xl font-semibold leading-tight text-stone-800">
@@ -11,10 +12,15 @@
         </div>
     </x-slot>
 
+
     <div class="py-6">
+
         <div class="mx-auto w-full px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12">
 
+            {{-- ========================================================= --}}
             {{-- Summary Cards --}}
+            {{-- ========================================================= --}}
+
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
 
                 {{-- Active Products --}}
@@ -34,6 +40,7 @@
 
                 </div>
 
+
                 {{-- Active Raw Materials --}}
                 <div class="rounded-xl border border-stone-200 bg-white p-5 shadow-sm">
 
@@ -50,6 +57,7 @@
                     </p>
 
                 </div>
+
 
                 {{-- Low Stock --}}
                 <div class="rounded-xl border border-stone-200 bg-white p-5 shadow-sm">
@@ -74,6 +82,7 @@
 
                 </div>
 
+
                 {{-- Active Employees --}}
                 <div class="rounded-xl border border-stone-200 bg-white p-5 shadow-sm">
 
@@ -94,11 +103,16 @@
             </div>
 
         </div>
+
     </div>
+
 
     <div class="px-3 sm:px-4 lg:px-12">
 
+        {{-- ========================================================= --}}
         {{-- Recent Distributions --}}
+        {{-- ========================================================= --}}
+
         <div class="mt-6 rounded-xl border border-stone-200 bg-white shadow-sm">
 
             <div class="border-b border-stone-200 px-5 py-4">
@@ -113,11 +127,13 @@
 
             </div>
 
+
             <div class="overflow-x-auto">
 
-                <table class="w-full min-w-[700px] text-left text-sm">
+                <table class="w-full min-w-[800px] text-left text-sm">
 
                     <thead class="border-b border-stone-200 bg-stone-50">
+
                         <tr>
 
                             <th class="px-5 py-3 font-semibold text-stone-700">
@@ -129,11 +145,17 @@
                             </th>
 
                             <th class="px-5 py-3 font-semibold text-stone-700">
+                                Assignment
+                            </th>
+
+                            <th class="px-5 py-3 font-semibold text-stone-700">
                                 Products
                             </th>
 
                         </tr>
+
                     </thead>
+
 
                     <tbody class="divide-y divide-stone-200">
 
@@ -141,32 +163,75 @@
 
                             <tr class="hover:bg-stone-50">
 
+                                {{-- Date --}}
                                 <td class="whitespace-nowrap px-5 py-3 text-stone-600">
-                                    {{ $distribution->distribution_date->format('d M Y') }}
+
+                                    {{ $distribution->distribution_date
+                                        ? $distribution->distribution_date->format('d M Y')
+                                        : '-'
+                                    }}
+
                                 </td>
 
+
+                                {{-- Employee --}}
                                 <td class="px-5 py-3 font-medium text-stone-800">
-                                    {{ $distribution->employee->user->name ?? '-' }}
+
+                                    {{ $distribution->assignment?->employee?->user?->name ?? '-' }}
+
                                 </td>
 
+
+                                {{-- Assignment --}}
                                 <td class="px-5 py-3 text-stone-600">
-                                    {{ $distribution->details->map(function ($detail) {
-                                        return $detail->baseDrink->name
-                                            . ' ('
-                                            . rtrim(
-                                                rtrim(
-                                                    number_format(
-                                                        $detail->quantity,
-                                                        2,
+
+                                    @if ($distribution->assignment)
+
+                                        {{ $distribution->assignment->cart?->name ?? '-' }}
+
+                                        <span class="text-stone-400">
+                                            -
+                                        </span>
+
+                                        {{ $distribution->assignment->region?->name ?? '-' }}
+
+                                    @else
+
+                                        -
+
+                                    @endif
+
+                                </td>
+
+
+                                {{-- Products --}}
+                                <td class="px-5 py-3 text-stone-600">
+
+                                    @if ($distribution->productDetails->isNotEmpty())
+
+                                        {{ $distribution->productDetails
+                                            ->map(function ($detail) {
+
+                                                return ($detail->baseDrink?->name ?? '-')
+                                                    . ' ('
+                                                    . number_format(
+                                                        $detail->quantity_distributed,
+                                                        0,
                                                         ',',
                                                         '.'
-                                                    ),
-                                                    '0'
-                                                ),
-                                                ','
-                                            )
-                                            . ')';
-                                    })->implode(', ') }}
+                                                    )
+                                                    . ')';
+
+                                            })
+                                            ->implode(', ')
+                                        }}
+
+                                    @else
+
+                                        -
+
+                                    @endif
+
                                 </td>
 
                             </tr>
@@ -174,12 +239,14 @@
                         @empty
 
                             <tr>
+
                                 <td
-                                    colspan="3"
+                                    colspan="4"
                                     class="px-5 py-8 text-center text-sm text-stone-500"
                                 >
                                     No distribution records found.
                                 </td>
+
                             </tr>
 
                         @endforelse
@@ -193,7 +260,10 @@
         </div>
 
 
+        {{-- ========================================================= --}}
         {{-- Recent Sales --}}
+        {{-- ========================================================= --}}
+
         <div class="mt-6 rounded-xl border border-stone-200 bg-white shadow-sm">
 
             <div class="border-b border-stone-200 px-5 py-4">
@@ -208,11 +278,13 @@
 
             </div>
 
+
             <div class="overflow-x-auto">
 
-                <table class="w-full min-w-[700px] text-left text-sm">
+                <table class="w-full min-w-[750px] text-left text-sm">
 
                     <thead class="border-b border-stone-200 bg-stone-50">
+
                         <tr>
 
                             <th class="px-5 py-3 font-semibold text-stone-700">
@@ -232,7 +304,9 @@
                             </th>
 
                         </tr>
+
                     </thead>
+
 
                     <tbody class="divide-y divide-stone-200">
 
@@ -240,13 +314,21 @@
 
                             <tr class="hover:bg-stone-50">
 
+                                {{-- Date --}}
                                 <td class="whitespace-nowrap px-5 py-3 text-stone-600">
-                                    {{ $sale->sale_date->format('d M Y') }}
+
+                                    {{ $sale->sale_date
+                                        ? $sale->sale_date->format('d M Y')
+                                        : '-'
+                                    }}
+
                                 </td>
 
+
+                                {{-- Source --}}
                                 <td class="px-5 py-3">
 
-                                    @if($sale->sale_source === 'Outlet')
+                                    @if ($sale->sale_source === 'Outlet')
 
                                         <span
                                             class="inline-flex rounded-full
@@ -272,20 +354,36 @@
 
                                 </td>
 
+
+                                {{-- Employee --}}
                                 <td class="px-5 py-3 text-stone-600">
-                                    {{ $sale->employee->user->name ?? '-' }}
+
+                                    @if ($sale->sale_source === 'Employee')
+
+                                        {{ $sale->distribution?->assignment?->employee?->user?->name ?? '-' }}
+
+                                    @else
+
+                                        -
+
+                                    @endif
+
                                 </td>
 
+
+                                {{-- Total --}}
                                 <td
                                     class="whitespace-nowrap px-5 py-3
                                            text-right font-semibold text-stone-800"
                                 >
+
                                     Rp {{ number_format(
                                         $sale->details->sum('subtotal'),
                                         0,
                                         ',',
                                         '.'
                                     ) }}
+
                                 </td>
 
                             </tr>
@@ -293,12 +391,14 @@
                         @empty
 
                             <tr>
+
                                 <td
                                     colspan="4"
                                     class="px-5 py-8 text-center text-sm text-stone-500"
                                 >
                                     No sales records found.
                                 </td>
+
                             </tr>
 
                         @endforelse
@@ -312,7 +412,10 @@
         </div>
 
 
+        {{-- ========================================================= --}}
         {{-- Recent Incoming Goods --}}
+        {{-- ========================================================= --}}
+
         <div class="mt-6 rounded-xl border border-stone-200 bg-white shadow-sm">
 
             <div class="border-b border-stone-200 px-5 py-4">
@@ -326,6 +429,7 @@
                 </p>
 
             </div>
+
 
             <div class="overflow-x-auto">
 
@@ -355,20 +459,33 @@
 
                     </thead>
 
+
                     <tbody class="divide-y divide-stone-200">
 
                         @forelse($recentIncomingGoods as $incomingGood)
 
                             <tr class="hover:bg-stone-50">
 
+                                {{-- Date --}}
                                 <td class="whitespace-nowrap px-5 py-3 text-stone-600">
-                                    {{ $incomingGood->received_at->format('d M Y') }}
+
+                                    {{ $incomingGood->received_at
+                                        ? $incomingGood->received_at->format('d M Y')
+                                        : '-'
+                                    }}
+
                                 </td>
 
+
+                                {{-- Raw Material --}}
                                 <td class="px-5 py-3 font-medium text-stone-800">
-                                    {{ $incomingGood->rawMaterial->name ?? '-' }}
+
+                                    {{ $incomingGood->rawMaterial?->name ?? '-' }}
+
                                 </td>
 
+
+                                {{-- Quantity --}}
                                 <td class="px-5 py-3 text-right text-stone-600">
 
                                     {{ rtrim(
@@ -384,20 +501,24 @@
                                         ','
                                     ) }}
 
-                                    {{ $incomingGood->rawMaterial->unit ?? '' }}
+                                    {{ $incomingGood->rawMaterial?->unit ?? '' }}
 
                                 </td>
 
+
+                                {{-- Total Cost --}}
                                 <td
                                     class="px-5 py-3 text-right
                                            font-semibold text-stone-800"
                                 >
+
                                     Rp {{ number_format(
                                         $incomingGood->quantity * $incomingGood->unit_cost,
                                         0,
                                         ',',
                                         '.'
                                     ) }}
+
                                 </td>
 
                             </tr>
@@ -427,5 +548,5 @@
         </div>
 
     </div>
-</x-app-layout>
 
+</x-app-layout>

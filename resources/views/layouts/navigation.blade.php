@@ -222,14 +222,25 @@
                         </div>
                     </div>
 
-                    {{-- Financial Report - Owner Only --}}
+                    {{-- Owner Reports & Analytics --}}
                     @if(auth()->user()->role?->nama_role === 'Owner')
+
+                        {{-- Financial Report --}}
                         <a
                             href="{{ route('financial-reports.index') }}"
                             class="rounded-lg px-3 py-2 text-sm font-medium text-stone-600 transition hover:bg-stone-100 hover:text-stone-900"
                         >
                             Laporan Keuangan
                         </a>
+
+                        {{-- Sales Analytics --}}
+                        <a
+                            href="{{ route('sales-analytics.index') }}"
+                            class="rounded-lg px-3 py-2 text-sm font-medium text-stone-600 transition hover:bg-stone-100 hover:text-stone-900"
+                        >
+                            Analitik Penjualan
+                        </a>
+
                     @endif
 
                 @endif

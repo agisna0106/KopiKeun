@@ -1,163 +1,454 @@
 <x-app-layout>
+
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+
+        <div>
+            <h2 class="text-xl font-bold text-stone-900">
                 Sale Details
             </h2>
 
-            <div class="flex gap-2">
-                <a
-                    href="{{ route('sales.edit', $sale) }}"
-                    class="inline-flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
-                >
-                    Edit
-                </a>
-
-                <a
-                    href="{{ route('sales.index') }}"
-                    class="inline-flex items-center rounded-md bg-gray-200 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-300"
-                >
-                    Back
-                </a>
-            </div>
+            <p class="mt-1 text-sm text-stone-500">
+                View recorded sale information and products.
+            </p>
         </div>
+
     </x-slot>
 
+
     <div class="py-6">
+
         <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
 
-            @if (session('success'))
-                <div class="mb-4 rounded-md bg-green-50 p-4 text-sm text-green-700">
-                    {{ session('success') }}
-                </div>
-            @endif
+            <div class="space-y-6">
 
-            {{-- Sale Information --}}
-            <div class="mb-6 rounded-lg bg-white p-6 shadow-sm">
-                <h3 class="mb-4 text-lg font-semibold text-gray-800">
-                    Sale Information
-                </h3>
 
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {{-- ========================================================= --}}
+                {{-- Sale Information --}}
+                {{-- ========================================================= --}}
 
-                    <div>
-                        <p class="text-sm text-gray-500">Sale Source</p>
+                <x-app-card>
 
-                        <p class="mt-1 font-medium text-gray-900">
-                            {{ $sale->sale_source }}
-                        </p>
-                    </div>
+                    <div
+                        class="flex flex-col gap-4
+                               sm:flex-row sm:items-start
+                               sm:justify-between"
+                    >
 
-                    <div>
-                        <p class="text-sm text-gray-500">Employee</p>
+                        <div>
 
-                        <p class="mt-1 font-medium text-gray-900">
-                            @if ($sale->employee)
-                                {{ $sale->employee->user->name }}
-                            @else
-                                -
-                            @endif
-                        </p>
-                    </div>
+                            <div class="flex items-center gap-2">
 
-                    <div>
-                        <p class="text-sm text-gray-500">Sale Date</p>
-
-                        <p class="mt-1 font-medium text-gray-900">
-                            {{ $sale->sale_date->format('d/m/Y') }}
-                        </p>
-                    </div>
-
-                    <div>
-                        <p class="text-sm text-gray-500">Notes</p>
-
-                        <p class="mt-1 font-medium text-gray-900">
-                            {{ $sale->notes ?: '-' }}
-                        </p>
-                    </div>
-
-                </div>
-            </div>
-
-            {{-- Sale Details --}}
-            <div class="overflow-hidden rounded-lg bg-white shadow-sm">
-                <div class="p-6">
-                    <h3 class="text-lg font-semibold text-gray-800">
-                        Sale Items
-                    </h3>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                    Product
-                                </th>
-
-                                <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                    Quantity
-                                </th>
-
-                                <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                    Unit Price
-                                </th>
-
-                                <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">
-                                    Subtotal
-                                </th>
-                            </tr>
-                        </thead>
-
-                        <tbody class="divide-y divide-gray-200 bg-white">
-                            @forelse ($sale->details as $detail)
-                                <tr>
-                                    <td class="px-6 py-4 text-sm text-gray-900">
-                                        {{ $detail->product->name }}
-                                    </td>
-
-                                    <td class="px-6 py-4 text-right text-sm text-gray-900">
-                                        {{ number_format($detail->quantity, 0, ',', '.') }}
-                                    </td>
-
-                                    <td class="px-6 py-4 text-right text-sm text-gray-900">
-                                        Rp {{ number_format($detail->unit_price, 0, ',', '.') }}
-                                    </td>
-
-                                    <td class="px-6 py-4 text-right text-sm font-medium text-gray-900">
-                                        Rp {{ number_format($detail->subtotal, 0, ',', '.') }}
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td
-                                        colspan="4"
-                                        class="px-6 py-6 text-center text-sm text-gray-500"
-                                    >
-                                        No sale items found.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-
-                        <tfoot class="bg-gray-50">
-                            <tr>
-                                <td
-                                    colspan="3"
-                                    class="px-6 py-4 text-right text-sm font-semibold text-gray-800"
+                                <span
+                                    class="rounded-full px-2.5 py-1
+                                           text-xs font-semibold
+                                           {{ $sale->sale_source === 'Employee'
+                                                ? 'bg-blue-50 text-blue-700'
+                                                : 'bg-green-50 text-green-700' }}"
                                 >
-                                    Grand Total
-                                </td>
+                                    {{ $sale->sale_source }}
+                                </span>
 
-                                <td class="px-6 py-4 text-right text-base font-bold text-gray-900">
-                                    Rp {{ number_format($sale->details->sum('subtotal'), 0, ',', '.') }}
-                                </td>
-                            </tr>
-                        </tfoot>
-                    </table>
+                            </div>
+
+
+                            @if ($sale->sale_source === 'Employee')
+
+                                <h3
+                                    class="mt-3 text-lg font-bold
+                                           text-stone-900"
+                                >
+                                    {{ $sale->distribution?->assignment?->employee?->user?->name ?? '-' }}
+                                </h3>
+
+                                <p class="mt-1 text-sm text-stone-500">
+
+                                    Employee Code:
+
+                                    {{ $sale->distribution?->assignment?->employee?->employee_code ?? '-' }}
+
+                                </p>
+
+                            @else
+
+                                <h3
+                                    class="mt-3 text-lg font-bold
+                                           text-stone-900"
+                                >
+                                    Outlet Sale
+                                </h3>
+
+                            @endif
+
+                        </div>
+
+
+                        {{-- Actions --}}
+
+                        <div class="flex items-center gap-2">
+
+                            <a
+                                href="{{ route('sales.edit', $sale) }}"
+                                class="rounded-lg bg-amber-50 px-3 py-2
+                                       text-xs font-semibold text-amber-700
+                                       hover:bg-amber-100"
+                            >
+                                Edit
+                            </a>
+
+                            <a
+                                href="{{ route('sales.index') }}"
+                                class="rounded-lg bg-stone-100 px-3 py-2
+                                       text-xs font-semibold text-stone-700
+                                       hover:bg-stone-200"
+                            >
+                                Back
+                            </a>
+
+                        </div>
+
+                    </div>
+
+
+                    {{-- ===================================================== --}}
+                    {{-- Information --}}
+                    {{-- ===================================================== --}}
+
+                    <div
+                        class="mt-6 grid gap-4
+                               sm:grid-cols-2"
+                    >
+
+                        {{-- Sale Date --}}
+
+                        <div
+                            class="rounded-lg bg-stone-50
+                                   px-4 py-3"
+                        >
+
+                            <p
+                                class="text-xs font-semibold
+                                       text-stone-500"
+                            >
+                                Sale Date
+                            </p>
+
+                            <p
+                                class="mt-1 text-sm font-semibold
+                                       text-stone-800"
+                            >
+                                {{ $sale->sale_date?->format('d M Y') ?? '-' }}
+                            </p>
+
+                        </div>
+
+
+                        {{-- Distribution Date --}}
+
+                        @if ($sale->sale_source === 'Employee')
+
+                            <div
+                                class="rounded-lg bg-stone-50
+                                       px-4 py-3"
+                            >
+
+                                <p
+                                    class="text-xs font-semibold
+                                           text-stone-500"
+                                >
+                                    Distribution Date
+                                </p>
+
+                                <p
+                                    class="mt-1 text-sm font-semibold
+                                           text-stone-800"
+                                >
+                                    {{ $sale->distribution?->distribution_date?->format('d M Y') ?? '-' }}
+                                </p>
+
+                            </div>
+
+                        @endif
+
+
+                        {{-- Distribution ID --}}
+
+                        @if ($sale->sale_source === 'Employee')
+
+                            <div
+                                class="rounded-lg bg-stone-50
+                                       px-4 py-3"
+                            >
+
+                                <p
+                                    class="text-xs font-semibold
+                                           text-stone-500"
+                                >
+                                    Distribution
+                                </p>
+
+                                <p
+                                    class="mt-1 text-sm font-semibold
+                                           text-stone-800"
+                                >
+                                    #{{ $sale->distribution_id }}
+                                </p>
+
+                            </div>
+
+                        @endif
+
+                    </div>
+
+                </x-app-card>
+
+
+                {{-- ========================================================= --}}
+                {{-- Products --}}
+                {{-- ========================================================= --}}
+
+                <x-app-card>
+
+                    <div>
+
+                        <h3
+                            class="text-base font-bold
+                                   text-stone-900"
+                        >
+                            Products
+                        </h3>
+
+                        <p
+                            class="mt-1 text-sm text-stone-500"
+                        >
+                            Products recorded in this sale.
+                        </p>
+
+                    </div>
+
+
+                    @if ($sale->details->isNotEmpty())
+
+                        <div
+                            class="mt-5 overflow-hidden
+                                   rounded-lg border border-stone-200"
+                        >
+
+                            {{-- Header --}}
+
+                            <div
+                                class="grid grid-cols-4
+                                       bg-stone-50 px-4 py-3
+                                       text-xs font-semibold
+                                       text-stone-600"
+                            >
+
+                                <span>
+                                    Product
+                                </span>
+
+                                <span class="text-center">
+                                    Quantity
+                                </span>
+
+                                <span class="text-right">
+                                    Unit Price
+                                </span>
+
+                                <span class="text-right">
+                                    Subtotal
+                                </span>
+
+                            </div>
+
+
+                            {{-- Details --}}
+
+                            @foreach ($sale->details as $detail)
+
+                                <div
+                                    class="grid grid-cols-4
+                                           border-t border-stone-200
+                                           px-4 py-3 text-sm"
+                                >
+
+                                    {{-- Product --}}
+
+                                    <span
+                                        class="font-medium
+                                               text-stone-700"
+                                    >
+                                        {{ $detail->product?->name ?? '-' }}
+                                    </span>
+
+
+                                    {{-- Quantity --}}
+
+                                    <span
+                                        class="text-center
+                                               text-stone-600"
+                                    >
+                                        {{ $detail->quantity }}
+                                    </span>
+
+
+                                    {{-- Unit Price --}}
+
+                                    <span
+                                        class="text-right
+                                               text-stone-600"
+                                    >
+                                        Rp
+                                        {{ number_format(
+                                            $detail->product->price,
+                                            0,
+                                            ',',
+                                            '.'
+                                        ) }}
+                                    </span>
+
+
+                                    {{-- Subtotal --}}
+
+                                    <span
+                                        class="text-right
+                                               font-medium
+                                               text-stone-700"
+                                    >
+                                        Rp
+                                        {{ number_format(
+                                            $detail->subtotal,
+                                            0,
+                                            ',',
+                                            '.'
+                                        ) }}
+                                    </span>
+
+                                </div>
+
+                            @endforeach
+
+                        </div>
+
+
+                        {{-- ================================================= --}}
+                        {{-- Total --}}
+                        {{-- ================================================= --}}
+
+                        <div
+                            class="mt-4 flex items-center
+                                   justify-between rounded-lg
+                                   bg-stone-50 px-4 py-4"
+                        >
+
+                            <span
+                                class="text-sm font-semibold
+                                       text-stone-700"
+                            >
+                                Total Sales
+                            </span>
+
+
+                            <span
+                                class="text-lg font-bold
+                                       text-stone-900"
+                            >
+                                Rp
+                                {{ number_format(
+                                    $sale->details->sum('subtotal'),
+                                    0,
+                                    ',',
+                                    '.'
+                                ) }}
+                            </span>
+
+                        </div>
+
+                    @else
+
+                        <div
+                            class="mt-5 rounded-lg border
+                                   border-dashed border-stone-300
+                                   px-4 py-8 text-center"
+                        >
+
+                            <p
+                                class="text-sm font-medium
+                                       text-stone-600"
+                            >
+                                No products recorded.
+                            </p>
+
+                        </div>
+
+                    @endif
+
+                </x-app-card>
+
+
+                {{-- ========================================================= --}}
+                {{-- Notes --}}
+                {{-- ========================================================= --}}
+
+                @if ($sale->notes)
+
+                    <x-app-card>
+
+                        <div>
+
+                            <h3
+                                class="text-base font-bold
+                                       text-stone-900"
+                            >
+                                Notes
+                            </h3>
+
+                            <p
+                                class="mt-2 text-sm leading-6
+                                       text-stone-600"
+                            >
+                                {{ $sale->notes }}
+                            </p>
+
+                        </div>
+
+                    </x-app-card>
+
+                @endif
+
+
+                {{-- ========================================================= --}}
+                {{-- Bottom Actions --}}
+                {{-- ========================================================= --}}
+
+                <div
+                    class="flex items-center
+                           justify-end gap-3"
+                >
+
+                    <a
+                        href="{{ route('sales.index') }}"
+                        class="rounded-lg bg-stone-100 px-4 py-2
+                               text-sm font-semibold text-stone-700
+                               hover:bg-stone-200"
+                    >
+                        Back to Sales
+                    </a>
+
+                    <a
+                        href="{{ route('sales.edit', $sale) }}"
+                        class="rounded-lg bg-amber-700 px-4 py-2
+                               text-sm font-semibold text-white
+                               hover:bg-amber-800"
+                    >
+                        Edit Sale
+                    </a>
+
                 </div>
+
             </div>
 
         </div>
+
     </div>
+
 </x-app-layout>

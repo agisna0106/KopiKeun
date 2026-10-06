@@ -13,6 +13,7 @@ class Sale extends Model
     protected $fillable = [
         'sale_source',
         'distribution_id',
+        'employee_id',
         'sale_date',
         'notes',
     ];
@@ -21,9 +22,6 @@ class Sale extends Model
         'sale_date' => 'date',
     ];
 
-    /**
-     * Sale belongs to a distribution.
-     */
     public function distribution(): BelongsTo
     {
         return $this->belongsTo(
@@ -32,9 +30,6 @@ class Sale extends Model
         );
     }
 
-    /**
-     * Sale has many sale details.
-     */
     public function details(): HasMany
     {
         return $this->hasMany(

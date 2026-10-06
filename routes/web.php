@@ -17,6 +17,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\RegionController;
 use App\Http\Controllers\OperationalItemController;
 use App\Http\Controllers\AssignmentController;
+use App\Http\Controllers\SalesAnalyticsController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -90,6 +91,11 @@ Route::middleware(['auth', 'role:Owner'])
             '/financial-reports',
             [FinancialReportController::class, 'index']
         )->name('financial-reports.index');
+
+        Route::get(
+            '/analitik-penjualan',
+            [SalesAnalyticsController::class, 'index']
+        )->name('sales-analytics.index');
 
     });
 

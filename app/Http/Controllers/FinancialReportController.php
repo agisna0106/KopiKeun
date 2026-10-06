@@ -12,99 +12,241 @@ class FinancialReportController extends Controller
 {
     public function index(Request $request): View
     {
+        /*
+        |--------------------------------------------------------------------------
+        | Report Period
+        |--------------------------------------------------------------------------
+        */
+
         $startDate = $request->input(
             'start_date',
-            now()->startOfMonth()->format('Y-m-d')
+            now('Asia/Jakarta')
+                ->startOfMonth()
+                ->format('Y-m-d')
         );
 
         $endDate = $request->input(
             'end_date',
-            now()->format('Y-m-d')
+            now('Asia/Jakarta')
+                ->format('Y-m-d')
         );
 
+
         /*
-        These queries not affecting the summary.
+        |--------------------------------------------------------------------------
+        | SALES / INCOME
+        |--------------------------------------------------------------------------
         */
 
         $salesForSummary = Sale::with('details')
-            ->whereBetween('sale_date', [$startDate, $endDate])
+            ->whereDate('sale_date', '>=', $startDate)
+            ->whereDate('sale_date', '<=', $endDate)
             ->get();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Outlet Income
+        |--------------------------------------------------------------------------
+        */
 
         $outletIncome = $salesForSummary
             ->where('sale_source', 'Outlet')
             ->sum(function ($sale) {
+
                 return $sale->details->sum('subtotal');
+
             });
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Employee Income
+        |--------------------------------------------------------------------------
+        */
 
         $employeeIncome = $salesForSummary
             ->where('sale_source', 'Employee')
             ->sum(function ($sale) {
+
                 return $sale->details->sum('subtotal');
+
             });
 
-        $totalIncome = $outletIncome + $employeeIncome;
-
-        $incomingGoodsForSummary = IncomingGood::query()
-            ->whereBetween('received_at', [$startDate, $endDate])
-            ->get();
-
-        $incomingGoodsExpense = $incomingGoodsForSummary->sum(
-            function ($item) {
-                return $item->quantity * $item->unit_cost;
-            }
-        );
-
-        $operationalExpense = OperationalExpense::query()
-            ->whereBetween('expense_date', [$startDate, $endDate])
-            ->sum('amount');
-
-        $totalExpense = $incomingGoodsExpense + $operationalExpense;
-
-        $profit = $totalIncome - $totalExpense;
 
         /*
         |--------------------------------------------------------------------------
-        | Paginated Detail Queries
+        | Total Income
         |--------------------------------------------------------------------------
         */
 
+        $totalIncome =
+            $outletIncome +
+            $employeeIncome;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | INCOMING GOODS EXPENSE
+        |--------------------------------------------------------------------------
+        */
+
+        $incomingGoodsForSummary = IncomingGood::query()
+            ->whereDate('received_at', '>=', $startDate)
+            ->whereDate('received_at', '<=', $endDate)
+            ->get();
+
+
+        $incomingGoodsExpense = $incomingGoodsForSummary
+            ->sum(function ($item) {
+
+                return $item->quantity *
+                    $item->unit_cost;
+
+            });
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | OPERATIONAL EXPENSE
+        |--------------------------------------------------------------------------
+        */
+
+        $operationalExpense = OperationalExpense::query()
+            ->whereDate('expense_date', '>=', $startDate)
+            ->whereDate('expense_date', '<=', $endDate)
+            ->sum('amount');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | TOTAL EXPENSE
+        |--------------------------------------------------------------------------
+        */
+
+        $totalExpense =
+            $incomingGoodsExpense +
+            $operationalExpense;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PROFIT
+        |--------------------------------------------------------------------------
+        */
+
+        $profit =
+            $totalIncome -
+            $totalExpense;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PAGINATED SALES
+        |--------------------------------------------------------------------------
+        |
+        | Sale employee information is obtained through:
+        |
+        | Sale
+        |   ↓
+        | Distribution
+        |   ↓
+        | Assignment
+        |   ↓
+        | Employee
+        |   ↓
+        | User
+        |
+        */
+
         $sales = Sale::with([
-            'employee.user',
             'details.product',
+            'distribution.assignment.employee.user',
         ])
-            ->whereBetween('sale_date', [$startDate, $endDate])
+            ->whereDate('sale_date', '>=', $startDate)
+            ->whereDate('sale_date', '<=', $endDate)
             ->orderByDesc('sale_date')
-            ->latest()
-            ->paginate(15, ['*'], 'sales_page')
+            ->orderByDesc('id')
+            ->paginate(
+                15,
+                ['*'],
+                'sales_page'
+            )
             ->withQueryString();
 
-        $incomingGoods = IncomingGood::with('rawMaterial')
-            ->whereBetween('received_at', [$startDate, $endDate])
+
+        /*
+        |--------------------------------------------------------------------------
+        | PAGINATED INCOMING GOODS
+        |--------------------------------------------------------------------------
+        */
+
+        $incomingGoods = IncomingGood::with(
+            'rawMaterial'
+        )
+            ->whereDate('received_at', '>=', $startDate)
+            ->whereDate('received_at', '<=', $endDate)
             ->orderByDesc('received_at')
-            ->latest()
-            ->paginate(15, ['*'], 'incoming_goods_page')
+            ->orderByDesc('id')
+            ->paginate(
+                15,
+                ['*'],
+                'incoming_goods_page'
+            )
             ->withQueryString();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | PAGINATED OPERATIONAL EXPENSES
+        |--------------------------------------------------------------------------
+        */
 
         $operationalExpenses = OperationalExpense::query()
-            ->whereBetween('expense_date', [$startDate, $endDate])
+            ->whereDate('expense_date', '>=', $startDate)
+            ->whereDate('expense_date', '<=', $endDate)
             ->orderByDesc('expense_date')
-            ->latest()
-            ->paginate(15, ['*'], 'expenses_page')
+            ->orderByDesc('id')
+            ->paginate(
+                15,
+                ['*'],
+                'expenses_page'
+            )
             ->withQueryString();
 
-        return view('financial-reports.index', compact(
-            'startDate',
-            'endDate',
-            'sales',
-            'incomingGoods',
-            'operationalExpenses',
-            'outletIncome',
-            'employeeIncome',
-            'totalIncome',
-            'incomingGoodsExpense',
-            'operationalExpense',
-            'totalExpense',
-            'profit'
-        ));
+
+        /*
+        |--------------------------------------------------------------------------
+        | Return View
+        |--------------------------------------------------------------------------
+        */
+
+        return view(
+            'financial-reports.index',
+            compact(
+                'startDate',
+                'endDate',
+
+                'sales',
+
+                'incomingGoods',
+
+                'operationalExpenses',
+
+                'outletIncome',
+
+                'employeeIncome',
+
+                'totalIncome',
+
+                'incomingGoodsExpense',
+
+                'operationalExpense',
+
+                'totalExpense',
+
+                'profit'
+            )
+        );
     }
 }

@@ -10,7 +10,6 @@ use App\Models\IncomingGood;
 use App\Models\OperationalExpense;
 use App\Models\Product;
 use App\Models\Sale;
-
 use App\Models\Distribution;
 use App\Models\Employee;
 use App\Models\RawMaterial;
@@ -27,63 +26,190 @@ class DashboardController extends Controller
 
         $role = $user->role?->nama_role;
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | OWNER DASHBOARD
+        |--------------------------------------------------------------------------
+        */
+
         if ($role === 'Owner') {
 
+            /*
+            |--------------------------------------------------------------------------
+            | Current Period
+            |--------------------------------------------------------------------------
+            |
+            | Dashboard menggunakan waktu Indonesia (WIB).
+            |
+            */
 
-            $startDate = now()->startOfMonth();
-            $endDate = now();
+            $today = now('Asia/Jakarta');
 
+            $startDate = $today->copy()->startOfMonth();
+            $endDate = $today->copy()->endOfDay();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | SALES / INCOME
+            |--------------------------------------------------------------------------
+            |
+            | Sale:
+            |
+            | Sale
+            |   ├── sale_source = Outlet
+            |   └── sale_source = Employee
+            |
+            | Employee sales tetap terhubung ke Distribution,
+            | tetapi untuk laporan income kita hanya membutuhkan
+            | sale_source dan sale_details.
+            |
+            */
 
             $sales = Sale::with('details')
-                ->whereBetween('sale_date', [
-                    $startDate->toDateString(),
-                    $endDate->toDateString(),
-                ])
+                ->whereDate(
+                    'sale_date',
+                    '>=',
+                    $startDate->toDateString()
+                )
+                ->whereDate(
+                    'sale_date',
+                    '<=',
+                    $today->toDateString()
+                )
+                ->latest('sale_date')
                 ->get();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Outlet Income
+            |--------------------------------------------------------------------------
+            */
 
             $outletIncome = $sales
                 ->where('sale_source', 'Outlet')
                 ->sum(function ($sale) {
+
                     return $sale->details->sum('subtotal');
+
                 });
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Employee Income
+            |--------------------------------------------------------------------------
+            */
 
             $employeeIncome = $sales
                 ->where('sale_source', 'Employee')
                 ->sum(function ($sale) {
+
                     return $sale->details->sum('subtotal');
+
                 });
 
-            $totalIncome = $outletIncome + $employeeIncome;
+
+            /*
+            |--------------------------------------------------------------------------
+            | Total Income
+            |--------------------------------------------------------------------------
+            */
+
+            $totalIncome =
+                $outletIncome +
+                $employeeIncome;
 
 
-            $incomingGoods = IncomingGood::whereBetween(
+            /*
+            |--------------------------------------------------------------------------
+            | Incoming Goods Expense
+            |--------------------------------------------------------------------------
+            */
+
+            $incomingGoods = IncomingGood::whereDate(
                 'received_at',
-                [
-                    $startDate->toDateString(),
-                    $endDate->toDateString(),
-                ]
-            )->get();
+                '>=',
+                $startDate->toDateString()
+            )
+                ->whereDate(
+                    'received_at',
+                    '<=',
+                    $today->toDateString()
+                )
+                ->get();
 
-            $incomingGoodsExpense = $incomingGoods->sum(function ($item) {
-                return $item->quantity * $item->unit_cost;
-            });
 
-            $operationalExpense = OperationalExpense::whereBetween(
+            $incomingGoodsExpense = $incomingGoods->sum(
+                function ($item) {
+
+                    return $item->quantity *
+                        $item->unit_cost;
+
+                }
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Operational Expense
+            |--------------------------------------------------------------------------
+            */
+
+            $operationalExpense = OperationalExpense::whereDate(
                 'expense_date',
-                [
-                    $startDate->toDateString(),
-                    $endDate->toDateString(),
-                ]
-            )->sum('amount');
+                '>=',
+                $startDate->toDateString()
+            )
+                ->whereDate(
+                    'expense_date',
+                    '<=',
+                    $today->toDateString()
+                )
+                ->sum('amount');
 
-            $totalExpense = $incomingGoodsExpense + $operationalExpense;
+
+            /*
+            |--------------------------------------------------------------------------
+            | Total Expense
+            |--------------------------------------------------------------------------
+            */
+
+            $totalExpense =
+                $incomingGoodsExpense +
+                $operationalExpense;
 
 
-            $profit = $totalIncome - $totalExpense;
+            /*
+            |--------------------------------------------------------------------------
+            | Profit
+            |--------------------------------------------------------------------------
+            */
+
+            $profit =
+                $totalIncome -
+                $totalExpense;
 
 
-            $activeProducts = Product::where('status', 'Active')->count();
+            /*
+            |--------------------------------------------------------------------------
+            | Active Products
+            |--------------------------------------------------------------------------
+            */
 
+            $activeProducts = Product::where(
+                'status',
+                'Active'
+            )->count();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Chart Data
+            |--------------------------------------------------------------------------
+            */
 
             $chartLabels = [];
             $chartIncome = [];
@@ -91,84 +217,184 @@ class DashboardController extends Controller
 
             $currentDate = $startDate->copy();
 
-            while ($currentDate->lte($endDate)) {
 
-                $dateString = $currentDate->toDateString();
+            while ($currentDate->lte($today)) {
 
+                $dateString =
+                    $currentDate->toDateString();
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Daily Income
+                |--------------------------------------------------------------------------
+                */
 
                 $dailyIncome = $sales
                     ->filter(function ($sale) use ($dateString) {
-                        return $sale->sale_date->toDateString() === $dateString;
+
+                        return $sale->sale_date
+                            ->toDateString() === $dateString;
+
                     })
                     ->sum(function ($sale) {
-                        return $sale->details->sum('subtotal');
+
+                        return $sale->details
+                            ->sum('subtotal');
+
                     });
 
+
+                /*
+                |--------------------------------------------------------------------------
+                | Daily Incoming Goods
+                |--------------------------------------------------------------------------
+                */
 
                 $dailyIncomingGoods = $incomingGoods
                     ->filter(function ($item) use ($dateString) {
-                        return $item->received_at->toDateString() === $dateString;
+
+                        return $item->received_at
+                            ->toDateString() === $dateString;
+
                     })
                     ->sum(function ($item) {
-                        return $item->quantity * $item->unit_cost;
+
+                        return $item->quantity *
+                            $item->unit_cost;
+
                     });
 
 
-                $dailyOperationalExpense = OperationalExpense::whereDate(
-                    'expense_date',
-                    $dateString
-                )->sum('amount');
+                /*
+                |--------------------------------------------------------------------------
+                | Daily Operational Expense
+                |--------------------------------------------------------------------------
+                */
+
+                $dailyOperationalExpense =
+                    OperationalExpense::whereDate(
+                        'expense_date',
+                        $dateString
+                    )->sum('amount');
+
+
+                /*
+                |--------------------------------------------------------------------------
+                | Daily Expense
+                |--------------------------------------------------------------------------
+                */
 
                 $dailyExpense =
                     $dailyIncomingGoods +
                     $dailyOperationalExpense;
 
+
                 /*
-                | Chart Data
+                |--------------------------------------------------------------------------
+                | Chart
+                |--------------------------------------------------------------------------
                 */
 
-                $chartLabels[] = $currentDate->format('d M');
-                $chartIncome[] = $dailyIncome;
-                $chartExpense[] = $dailyExpense;
+                $chartLabels[] =
+                    $currentDate->format('d M');
+
+                $chartIncome[] =
+                    $dailyIncome;
+
+                $chartExpense[] =
+                    $dailyExpense;
+
 
                 $currentDate->addDay();
             }
 
 
-            return view('dashboard.owner', compact(
-                'startDate',
-                'endDate',
-                'outletIncome',
-                'employeeIncome',
-                'totalIncome',
-                'incomingGoodsExpense',
-                'operationalExpense',
-                'totalExpense',
-                'profit',
-                'activeProducts',
-                'chartLabels',
-                'chartIncome',
-                'chartExpense'
-            ));
+            /*
+            |--------------------------------------------------------------------------
+            | Recent Sales
+            |--------------------------------------------------------------------------
+            |
+            | Kita sekalian kirim data penjualan ke Dashboard Owner
+            | supaya nanti bisa ditampilkan sebagai daftar transaksi.
+            |
+            */
+
+            $recentSales = Sale::with([
+                'details.product',
+                'distribution.assignment.employee.user',
+            ])
+                ->latest('sale_date')
+                ->latest()
+                ->take(5)
+                ->get();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Return Owner Dashboard
+            |--------------------------------------------------------------------------
+            */
+
+            return view(
+                'dashboard.owner',
+                compact(
+                    'startDate',
+                    'endDate',
+                    'outletIncome',
+                    'employeeIncome',
+                    'totalIncome',
+                    'incomingGoodsExpense',
+                    'operationalExpense',
+                    'totalExpense',
+                    'profit',
+                    'activeProducts',
+                    'chartLabels',
+                    'chartIncome',
+                    'chartExpense',
+                    'recentSales'
+                )
+            );
         }
 
 
+        /*
+        |--------------------------------------------------------------------------
+        | STAFF OPERASIONAL DASHBOARD
+        |--------------------------------------------------------------------------
+        */
+
         if ($role === 'Staff Operasional') {
 
+            /*
+            |--------------------------------------------------------------------------
+            | Basic Statistics
+            |--------------------------------------------------------------------------
+            */
 
-            $activeProducts = Product::where('status', 'Active')->count();
+            $activeProducts = Product::where(
+                'status',
+                'Active'
+            )->count();
+
 
             $activeRawMaterials = RawMaterial::where(
                 'status',
                 'Active'
             )->count();
 
+
             $lowStockMaterials = RawMaterial::where(
                 'status',
                 'Active'
             )
-                ->whereColumn('current_stock', '<=', 'minimum_stock')
+                ->whereColumn(
+                    'current_stock',
+                    '<=',
+                    'minimum_stock'
+                )
                 ->count();
+
 
             $activeEmployees = Employee::where(
                 'status',
@@ -176,8 +402,27 @@ class DashboardController extends Controller
             )->count();
 
 
+            /*
+            |--------------------------------------------------------------------------
+            | Recent Distributions
+            |--------------------------------------------------------------------------
+            |
+            | Distribution sekarang tidak memiliki employee_id.
+            |
+            | Relasi:
+            |
+            | Distribution
+            |   ↓
+            | Assignment
+            |   ↓
+            | Employee
+            |   ↓
+            | User
+            |
+            */
+
             $recentDistributions = Distribution::with([
-                'employee.user',
+                'assignment.employee.user',
                 'productDetails.baseDrink',
                 'operationalDetails.operationalItem',
             ])
@@ -187,14 +432,38 @@ class DashboardController extends Controller
                 ->get();
 
 
+            /*
+            |--------------------------------------------------------------------------
+            | Recent Sales
+            |--------------------------------------------------------------------------
+            |
+            | Sale sekarang:
+            |
+            | Sale
+            |   ↓
+            | Distribution
+            |   ↓
+            | Assignment
+            |   ↓
+            | Employee
+            |
+            */
+
             $recentSales = Sale::with([
-                'employee.user',
+                'distribution.assignment.employee.user',
                 'details.product',
             ])
                 ->latest('sale_date')
                 ->latest()
                 ->take(5)
                 ->get();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Recent Incoming Goods
+            |--------------------------------------------------------------------------
+            */
 
             $recentIncomingGoods = IncomingGood::with(
                 'rawMaterial'
@@ -204,18 +473,35 @@ class DashboardController extends Controller
                 ->take(5)
                 ->get();
 
-            return view('dashboard.staff', compact(
-                'activeProducts',
-                'activeRawMaterials',
-                'lowStockMaterials',
-                'activeEmployees',
-                'recentDistributions',
-                'recentSales',
-                'recentIncomingGoods'
-            ));
+
+            return view(
+                'dashboard.staff',
+                compact(
+                    'activeProducts',
+                    'activeRawMaterials',
+                    'lowStockMaterials',
+                    'activeEmployees',
+                    'recentDistributions',
+                    'recentSales',
+                    'recentIncomingGoods'
+                )
+            );
         }
 
+
+        /*
+        |--------------------------------------------------------------------------
+        | KARYAWAN DASHBOARD
+        |--------------------------------------------------------------------------
+        */
+
         if ($role === 'Karyawan') {
+
+            /*
+            |--------------------------------------------------------------------------
+            | Get Employee
+            |--------------------------------------------------------------------------
+            */
 
             $employee = $user->employee;
 
@@ -224,51 +510,118 @@ class DashboardController extends Controller
             }
 
 
+            /*
+            |--------------------------------------------------------------------------
+            | Today's Distribution
+            |--------------------------------------------------------------------------
+            */
+
             $today = now()->toDateString();
 
             $todayDistribution = Distribution::with([
+                'assignment.employee.user',
+                'assignment.cart',
+                'assignment.region',
                 'productDetails.baseDrink',
                 'operationalDetails.operationalItem',
             ])
-                ->where('employee_id', $employee->id)
+                ->whereHas('assignment', function ($query) use ($employee) {
+                    $query->where('employee_id', $employee->id);
+                })
                 ->whereDate('distribution_date', $today)
+                ->latest('distribution_date')
                 ->latest()
                 ->first();
 
 
+            /*
+            |--------------------------------------------------------------------------
+            | Today's Sales
+            |--------------------------------------------------------------------------
+            |
+            | Employee sales are connected to the employee through:
+            |
+            | Sale
+            |   ↓
+            | Distribution
+            |   ↓
+            | Assignment
+            |   ↓
+            | Employee
+            |
+            */
+
             $todaySales = Sale::with([
                 'details.product',
+                'distribution.assignment.employee.user',
             ])
-                ->where('employee_id', $employee->id)
                 ->where('sale_source', 'Employee')
+                ->whereHas('distribution.assignment', function ($query) use ($employee) {
+                    $query->where('employee_id', $employee->id);
+                })
                 ->whereDate('sale_date', $today)
+                ->latest()
                 ->get();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Today's Sales Total
+            |--------------------------------------------------------------------------
+            */
 
             $todaySalesTotal = $todaySales->sum(function ($sale) {
                 return $sale->details->sum('subtotal');
             });
 
 
+            /*
+            |--------------------------------------------------------------------------
+            | Recent Distributions
+            |--------------------------------------------------------------------------
+            */
+
             $recentDistributions = Distribution::with([
+                'assignment.employee.user',
+                'assignment.cart',
+                'assignment.region',
                 'productDetails.baseDrink',
                 'operationalDetails.operationalItem',
             ])
-                ->where('employee_id', $employee->id)
+                ->whereHas('assignment', function ($query) use ($employee) {
+                    $query->where('employee_id', $employee->id);
+                })
                 ->latest('distribution_date')
                 ->latest()
                 ->take(5)
                 ->get();
 
 
+            /*
+            |--------------------------------------------------------------------------
+            | Recent Sales
+            |--------------------------------------------------------------------------
+            */
+
             $recentSales = Sale::with([
                 'details.product',
+                'distribution.assignment.employee.user',
             ])
-                ->where('employee_id', $employee->id)
                 ->where('sale_source', 'Employee')
+                ->whereHas('distribution.assignment', function ($query) use ($employee) {
+                    $query->where('employee_id', $employee->id);
+                })
                 ->latest('sale_date')
                 ->latest()
                 ->take(5)
                 ->get();
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Return Employee Dashboard
+            |--------------------------------------------------------------------------
+            */
 
             return view('dashboard.karyawan', compact(
                 'employee',
@@ -280,6 +633,16 @@ class DashboardController extends Controller
             ));
         }
 
-        return abort(403, 'Role pengguna tidak dikenali.');
+
+        /*
+        |--------------------------------------------------------------------------
+        | Unknown Role
+        |--------------------------------------------------------------------------
+        */
+
+        abort(
+            403,
+            'Role pengguna tidak dikenali.'
+        );
     }
 }
