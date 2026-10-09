@@ -20,7 +20,16 @@
                 <form
                     method="POST"
                     action="{{ route('raw-material-stock-records.store') }}"
-                    class="space-y-5">
+                    class="space-y-5"
+                    x-data="{ submitting: false }"
+                    @submit="
+                        if (submitting) {
+                            $event.preventDefault();
+                        } else {
+                            submitting = true;
+                        }
+                    "
+                    >
 
                     @csrf
 
@@ -142,8 +151,10 @@
 
                         <button
                             type="submit"
+                            :disabled="submitting"
                             class="inline-flex justify-center rounded-lg bg-amber-700 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-800">
-                            Save Stock Record
+                            <span x-show="!submitting">Simpan Penjualan</span>
+                            <span x-show="submitting">Menyimpan...</span>
                         </button>
 
                         <a

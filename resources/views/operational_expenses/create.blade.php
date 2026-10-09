@@ -15,6 +15,14 @@
                         action="{{ route('operational-expenses.store') }}"
                         method="POST"
                         class="space-y-6"
+                        x-data="{ submitting: false }"
+                        @submit="
+                            if (submitting) {
+                                $event.preventDefault();
+                            } else {
+                                submitting = true;
+                            }
+                        "
                     >
                         @csrf
 
@@ -59,8 +67,8 @@
                                 id="amount"
                                 name="amount"
                                 value="{{ old('amount') }}"
-                                step="0.01"
-                                min="0"
+                                step="1"
+                                min="1"
                                 required
                                 class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 placeholder="Enter expense amount"
@@ -134,9 +142,11 @@
 
                             <button
                                 type="submit"
+                                :disabled="submitting"
                                 class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700"
                             >
-                                Save Expense
+                                <span x-show="!submitting">Simpan</span>
+                                <span x-show="submitting">Menyimpan...</span>
                             </button>
 
                         </div>

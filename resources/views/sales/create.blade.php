@@ -55,6 +55,14 @@
                 method="POST"
                 id="sale-form"
                 class="space-y-6"
+                x-data="{ submitting: false }"
+                @submit="
+                    if (submitting) {
+                        $event.preventDefault();
+                    } else {
+                        submitting = true;
+                    }
+                "
             >
 
                 @csrf
@@ -517,11 +525,13 @@
 
                     <button
                         type="submit"
+                        :disabled="submitting"
                         class="rounded-lg bg-amber-700 px-5 py-2
                                text-sm font-semibold text-white
                                hover:bg-amber-800"
                     >
-                        Save Sale
+                        <span x-show="!submitting">Save Sale</span>
+                        <span x-show="submitting">Saving...</span>
                     </button>
 
                 </div>

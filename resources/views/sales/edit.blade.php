@@ -56,9 +56,24 @@
                 method="POST"
                 id="sale-form"
                 class="space-y-6"
+                x-data="{ submitting: false }"
+                    @submit="
+                        if (submitting) {
+                            $event.preventDefault();
+                        } else {
+                            submitting = true;
+                        }
+                    "
+                >
             >
 
                 @csrf
+
+                <input
+                    type="hidden"
+                    name="submission_token"
+                    value="{{ old('submission_token', (string) \Illuminate\Support\Str::uuid()) }}"
+                >
 
                 @method('PUT')
 
@@ -389,7 +404,8 @@
                                    text-xs font-semibold text-white
                                    hover:bg-amber-800"
                         >
-                            Add Product
+                            <span x-show="!submitting">Save</span>
+                            <span x-show="submitting">Saving...</span>
                         </button>
 
                     </div>

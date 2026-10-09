@@ -7,6 +7,7 @@ use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Database\QueryException;
 
 class ProductController extends Controller
 {
@@ -105,12 +106,23 @@ class ProductController extends Controller
             ->with('success', 'Product updated successfully.');
     }
 
+
     public function destroy(Product $product): RedirectResponse
     {
-        $product->delete();
+        try {
+            $product->delete();
+        } catch (QueryException $exception) {
+            return redirect()
+                ->route('products.index')
+                ->with(
+                    'error',
+                    'Produk tidak dapat dihapus karena masih digunakan dalam transaksi atau data lainnya.'
+                );
+        }
 
         return redirect()
             ->route('products.index')
             ->with('success', 'Product deleted successfully.');
     }
+
 }
