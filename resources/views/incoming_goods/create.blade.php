@@ -15,6 +15,14 @@
                         action="{{ route('incoming-goods.store') }}"
                         method="POST"
                         class="space-y-6"
+                        x-data="{ submitting: false }"
+                        @submit="
+                            if (submitting) {
+                                $event.preventDefault();
+                            } else {
+                                submitting = true;
+                            }
+                        "
                     >
                         @csrf
 
@@ -195,9 +203,11 @@
 
                             <button
                                 type="submit"
+                                :disabled="submitting"
                                 class="inline-flex items-center px-4 py-2 bg-gray-800 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150"
                             >
-                                Save Incoming Goods
+                                <span x-show="!submitting">Save</span>
+                                <span x-show="submitting">Saving...</span>
                             </button>
                         </div>
 
