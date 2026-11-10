@@ -69,20 +69,14 @@ class SalesAnalyticsController extends Controller
         */
 
         $employeePerformance = (clone $salesQuery)
-            ->where('sale_source', 'Employee')
+            ->whereHas('distribution.assignment.employee')
             ->with([
                 'details',
                 'distribution.assignment.employee.user',
             ])
             ->get()
             ->groupBy(function ($sale) {
-                return $sale->distribution?->assignment?->employee?->id;
-            })
-            ->filter(function ($sales) {
-                return $sales->first()
-                    ?->distribution
-                    ?->assignment
-                    ?->employee;
+                return $sale->distribution->assignment->employee->id;
             })
             ->map(function ($sales) {
                 $employee = $sales->first()
@@ -104,7 +98,6 @@ class SalesAnalyticsController extends Controller
             })
             ->sortByDesc('revenue')
             ->values();
-
         /*
         |--------------------------------------------------------------------------
         | Kinerja Wilayah
@@ -118,20 +111,14 @@ class SalesAnalyticsController extends Controller
         */
 
         $regionPerformance = (clone $salesQuery)
-            ->where('sale_source', 'Employee')
+            ->whereHas('distribution.assignment.region')
             ->with([
                 'details',
                 'distribution.assignment.region',
             ])
             ->get()
             ->groupBy(function ($sale) {
-                return $sale->distribution?->assignment?->region?->id;
-            })
-            ->filter(function ($sales) {
-                return $sales->first()
-                    ?->distribution
-                    ?->assignment
-                    ?->region;
+                return $sale->distribution->assignment->region->id;
             })
             ->map(function ($sales) {
                 $region = $sales->first()
@@ -141,7 +128,7 @@ class SalesAnalyticsController extends Controller
 
                 return [
                     'region' => $region,
-                    'region_name' => $region->name ?? '-',
+                    'region_name' => $region->name,
                     'transaction_count' => $sales->count(),
                     'products_sold' => $sales->sum(
                         fn ($sale) => $sale->details->sum('quantity')
@@ -153,7 +140,6 @@ class SalesAnalyticsController extends Controller
             })
             ->sortByDesc('revenue')
             ->values();
-
         /*
         |--------------------------------------------------------------------------
         | Produk Terlaris

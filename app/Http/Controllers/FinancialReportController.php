@@ -80,9 +80,9 @@ class FinancialReportController extends Controller
         |--------------------------------------------------------------------------
         */
 
-        $totalIncome =
-            $outletIncome +
-            $employeeIncome;
+        $totalIncome = $salesForSummary->sum(
+            fn ($sale) => $sale->details->sum('subtotal')
+        );
 
 
         /*
